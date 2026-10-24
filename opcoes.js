@@ -249,6 +249,8 @@
     const old = META && META.updated_at && (Date.now() - new Date(META.updated_at).getTime() > 26 * 3600e3);
     $("#opStatus").innerHTML = `Opções coletadas em <b>${esc(META.updated_brt || "—")}</b> (BRT) · Selic <b>${F2.format(si.v * 100)}%</b> (${si.src})` +
       (META.demo ? ` · <span class="warn">DADOS SIMULADOS</span>` : "") + (old ? ` · <span class="warn">⚠ dados com mais de 1 dia</span>` : "") +
+      (META.falhas && META.falhas.length ? `<br><span class="warn">${META.falhas.length} ativo(s) sem dados nesta coleta: ` +
+        META.falhas.slice(0, 6).map(t => esc(t) + (META.falhas_motivo && META.falhas_motivo[t] ? " (" + esc(META.falhas_motivo[t].slice(0, 60)) + ")" : "")).join(", ") + `</span>` : "") +
       (extra ? `<br>${extra}` : "");
   }
 
