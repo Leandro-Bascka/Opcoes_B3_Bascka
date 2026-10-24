@@ -1,0 +1,30 @@
+# Ativos da aba "Opções" (um por linha). Edite e dê push: a próxima atualização horária já usa a nova lista.
+# Quanto mais ativos, mais demorada a coleta (≈ 20–30 s por ativo, por causa do limite de requisições do site).
+ABEV3
+B3SA3
+BBAS3
+BBDC4
+BBSE3
+BRAP4
+CMIG4
+CPLE3
+CSNA3
+CYRE3
+DIRR3
+EGIE3
+EQTL3
+EZTC3
+GGBR4
+HAPV3
+ITSA4
+ITUB4
+PETR4
+PRIO3
+SANB11
+SOJA3
+SUZB3
+TAEE11
+USIM5
+VALE3
+VBBR3
+WEGE3
