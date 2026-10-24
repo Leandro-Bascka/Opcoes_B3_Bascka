@@ -2,9 +2,6 @@
 (function () {
   "use strict";
   const C = window.OPCORE;
-  // Configure após publicar o Worker. A URL é pública; o token do GitHub NUNCA fica neste arquivo.
-  const WORKER_API_URL = "https://COLE-SEU-WORKER.workers.dev";
-  const TURNSTILE_SITE_KEY = "COLE-SUA-SITE-KEY-DO-TURNSTILE";
   const $ = (s, r = document) => r.querySelector(s);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const NF = d => new Intl.NumberFormat("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -341,107 +338,23 @@
     }
   }
 
-  // ---------------------------------------------------------------- varredura real: aciona GitHub Actions por Worker e acompanha a execução
-  let remoteScanning = false;
-  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-  function remotePanel(message, detail = "") {
-    const tb = $("#opTables");
-    if (!tb) return;
-    tb.innerHTML = `<div class="op-card"><h3>🔎 Varredura real da B3</h3><div class="empty-msg">${esc(message)}${detail ? "\n\n" + esc(detail) : ""}</div><div class="prog"><s style="width:${remoteScanning ? 35 : 0}%"></s></div></div>`;
-  }
-  function loadTurnstile() {
-    if (window.turnstile) return Promise.resolve();
-    if (window.__opTurnstileLoading) return window.__opTurnstileLoading;
-    window.__opTurnstileLoading = new Promise((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-      script.async = true; script.defer = true;
-      script.onload = resolve; script.onerror = () => reject(new Error("Não foi possível carregar a validação Cloudflare Turnstile."));
-      document.head.appendChild(script);
-    });
-    return window.__opTurnstileLoading;
-  }
+  // ---------------------------------------------------------------- varredura da B3 (top 15 ativos)
   async function startScan(force) {
-    if (remoteScanning) return;
-    if (!force && SCANA) { run(); return; }
-    if (!WORKER_API_URL || WORKER_API_URL.includes("COLE-SEU-WORKER")) {
-      remotePanel("O botão está pronto para acionar a coleta real, mas falta configurar a URL do Cloudflare Worker.", "Publique cloudflare/worker.js e substitua WORKER_API_URL e TURNSTILE_SITE_KEY no início de opcoes.js conforme o README.");
-      return;
-    }
-    if (!TURNSTILE_SITE_KEY || TURNSTILE_SITE_KEY.includes("COLE-SUA-SITE-KEY")) {
-      remotePanel("Falta configurar a Site Key do Cloudflare Turnstile.", "Cadastre o domínio do GitHub Pages no Turnstile e cole a Site Key na constante TURNSTILE_SITE_KEY do opcoes.js.");
-      return;
-    }
-    const tb = $("#opTables");
-    tb.innerHTML = `<div class="op-card"><h3>🔎 Iniciar varredura</h3><p>Confirme a validação de segurança para iniciar a coleta atualizada no GitHub Actions.</p><div id="opTurnstile" style="margin:12px 0"></div><div id="opRemoteMessage" class="empty-msg">Aguardando validação de segurança…</div></div>`;
-    setStatus("Aguardando validação de segurança para iniciar a coleta…");
-    try {
-      await loadTurnstile();
-      window.turnstile.render("#opTurnstile", {
-        sitekey: TURNSTILE_SITE_KEY,
-        callback: token => dispatchRemoteScan(token),
-        "expired-callback": () => { const el = $("#opRemoteMessage"); if (el) el.textContent = "A validação expirou. Conclua novamente o desafio."; },
-        "error-callback": () => { const el = $("#opRemoteMessage"); if (el) el.textContent = "Falha na validação. Atualize a página e tente novamente."; }
-      });
-    } catch (e) { remotePanel("Não foi possível iniciar a validação.", e.message); }
-  }
-  async function startLocalScan() {
     if (scanning) return;
+    if (SCANA && !force) { run(); return; }
     scanning = true; scanDone = 0; SCANA = {};
     const list = META.ativos.map(a => a.t); let i = 0;
     run();
     const worker = async () => {
       while (i < list.length) {
         const t = list[i++];
-        try { SCANA[t] = await loadAsset(t); } catch (e) { /* falha detalhada em META.falhas_motivo; ativo sem arquivo não entra no ranking */ }
+        try { SCANA[t] = await loadAsset(t); } catch (e) { /* ativo sem arquivo: ignora */ }
         scanDone++;
         if (scanDone % 5 === 0 || scanDone === list.length) run();
       }
     };
     await Promise.all([worker(), worker(), worker(), worker(), worker(), worker()]);
     scanning = false; run();
-  }
-
-  async function dispatchRemoteScan(turnstileToken) {
-    if (remoteScanning) return;
-    remoteScanning = true;
-    const msg = $("#opRemoteMessage"); if (msg) msg.textContent = "Enviando solicitação segura ao GitHub Actions…";
-    try {
-      const base = WORKER_API_URL.replace(/\/$/, "");
-      const response = await fetch(base + "/scan", {
-        method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ turnstileToken })
-      });
-      const payload = await response.json().catch(() => ({}));
-      if (!response.ok && response.status !== 202) throw new Error(payload.error || `Worker respondeu HTTP ${response.status}`);
-      if (!payload.run_id) throw new Error(payload.message || "O GitHub recebeu a solicitação, mas ainda não forneceu o ID da execução. Verifique a aba Actions.");
-      const runUrl = payload.html_url || "";
-      let elapsed = 0;
-      while (elapsed < 30 * 60 * 1000) {
-        const sr = await fetch(base + "/status?run_id=" + encodeURIComponent(payload.run_id), { cache: "no-store" });
-        const status = await sr.json().catch(() => ({}));
-        if (!sr.ok) throw new Error(status.error || `Falha ao consultar status (HTTP ${sr.status})`);
-        const jobs = (status.jobs || []).map(j => `${j.name}: ${j.status}${j.conclusion ? " (" + j.conclusion + ")" : ""}`).join("\n");
-        const line = `GitHub Actions: ${status.status || "aguardando"}${status.conclusion ? " · resultado: " + status.conclusion : ""}`;
-        if (msg) msg.textContent = line + (jobs ? "\n" + jobs : "") + "\nA coleta pode levar alguns minutos. Não feche esta página.";
-        setStatus(esc(line) + (runUrl ? ` · <a href="${esc(runUrl)}" target="_blank" rel="noopener">ver execução</a>` : ""));
-        if (status.status === "completed") {
-          if (status.conclusion !== "success") throw new Error(`Workflow terminou com resultado: ${status.conclusion || "desconhecido"}. Abra a execução do GitHub Actions para ver os logs.`);
-          if (msg) msg.textContent = "Coleta e publicação concluídas. Atualizando os dados do site…";
-          try { sessionStorage.setItem("opcoes.runLocalAfterRemote", "1"); } catch (e) {}
-          await sleep(2500);
-          window.location.reload();
-          return;
-        }
-        await sleep(5000); elapsed += 5000;
-      }
-      throw new Error("A execução ultrapassou 30 minutos. Consulte os logs no GitHub Actions; a página continuará mostrando os dados publicados anteriormente.");
-    } catch (e) {
-      remoteScanning = false;
-      const el = $("#opRemoteMessage");
-      if (el) el.textContent = "Falha na varredura: " + e.message;
-      setStatus(`<span class="warn">Varredura não concluída: ${esc(e.message)}</span>`);
-    }
   }
   async function renderScan(my) {
     const tb = $("#opTables"), c = cfg(), n = META.ativos.length;
@@ -453,7 +366,7 @@
     }
     if (!SCANA) {
       setStatus();
-      tb.innerHTML = `<div class="op-card"><h3>Varrer a B3</h3><div class="empty-msg">Clique em <b>🔎 Varrer a B3</b> para iniciar uma nova coleta no GitHub Actions, aguardar a publicação e então analisar as ${n} ações com os dados atualizados.\n\nA execução e os erros serão mostrados aqui. Depois escolha uma ação para ver as melhores PUTs dela.</div>
+      tb.innerHTML = `<div class="op-card"><h3>Varrer a B3</h3><div class="empty-msg">Toque em <b>🔎 Varrer a B3</b> para o sistema analisar as ${n} ações coletadas e mostrar as ${TOPN} com as melhores PUTs para vender, segundo os filtros abaixo (DTE, delta, prêmio, range).\n\nDepois escolha uma ação da lista para ver as ${TOPP} melhores PUTs dela.\n\nOu escolha um ativo direto no campo “Ativo”.</div>
         <div style="margin-top:12px"><button class="btn go" data-act="varrer">🔎 Varrer a B3</button></div></div>`;
       return;
     }
@@ -593,13 +506,10 @@
       const selicAntes = selicInfo().v;
       fetchSelic().then(ok => { if (ok) { setStatus(); if (Math.abs(selicInfo().v - selicAntes) > 1e-9) run(); } });
       if (!show.ran || changed) { show.ran = true; run(); }
-      let autoLocal = false;
-      try { autoLocal = sessionStorage.getItem("opcoes.runLocalAfterRemote") === "1"; if (autoLocal) sessionStorage.removeItem("opcoes.runLocalAfterRemote"); } catch (e) {}
-      if (autoLocal) { view = "scan"; setTimeout(() => startLocalScan(), 150); }
     } catch (e) {
       $("#opCtrl").innerHTML = ""; $("#opTables").innerHTML = "";
       $("#opStatus").innerHTML = `<span class="warn">Dados de opções indisponíveis.</span>`;
-      $("#opTables").innerHTML = `<div class="op-card"><div class="empty-msg">Não foi possível carregar as opções (${esc(e.message)}).\n\nCausas comuns:\n• confira se a URL do Cloudflare Worker e a Site Key do Turnstile foram configuradas;\n• veja a aba Actions para os logs detalhados da coleta;\n• o site opcoes.net.br pode limitar requisições e causar falhas por ticker.</div></div>`;
+      $("#opTables").innerHTML = `<div class="op-card"><div class="empty-msg">Não foi possível carregar as opções (${esc(e.message)}).\n\nCausas comuns:\n• a primeira coleta ainda não rodou (aba Actions → "Atualizar dados e publicar" → Run workflow);\n• o site opcoes.net.br bloqueou/limitou a coleta nesta rodada — a próxima atualização horária tenta de novo.</div></div>`;
     }
   }
 

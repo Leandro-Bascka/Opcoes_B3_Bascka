@@ -32,7 +32,7 @@ jobs:
         run: |
           mkdir -p site
           cp index.html manifest.webmanifest opcore.js opcoes.js opcoes.css site/
-      - name: Diagnóstico rápido da API (não bloqueia a coleta)
+      - name: Diagnóstico da API (aparece no log)
         continue-on-error: true
         run: python -u build_options.py --diag PETR4
       - name: Coletar opções
@@ -40,10 +40,11 @@ jobs:
           PYTHONUNBUFFERED: "1"
         run: >
           python -u build_options.py --out site
-          --workers 5
-          --intervalo 0.25
+          --workers 3
+          --intervalo 0.6
           --max-min 18
-          --wheel-top 0
+          --wheel-top 80
+          --wheel-dte 45
           --hist-url "https://${{ github.repository_owner }}.github.io/Smc_B3"
           --prev-url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
       - name: Resumo do resultado por ativo
@@ -63,7 +64,7 @@ jobs:
           stale = [a.get('t') for a in ativos if a.get('stale')]
           fresh = [a.get('t') for a in ativos if not a.get('stale')]
           print(f"Tempo da coleta: {d.get('seconds', '?')} s")
-          print(f"Ativos atualizados: {len(fresh)} | recuperados de coleta anterior: {len(stale)} | falhas sem dados: {len(falhas)}")
+          print(f"Ativos atualizados: {len(fresh)} | de coleta anterior: {len(stale)} | falhas sem dados: {len(falhas)}")
           print('Atualizados:', ', '.join(fresh) or '(nenhum)')
           print('Dados antigos:', ', '.join(stale) or '(nenhum)')
           for t in falhas:
@@ -80,6 +81,7 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
