@@ -97,7 +97,7 @@ class Net:
         if saida > agora:
             time.sleep(saida - agora)
 
-    def get_json(self, url, tentativas=3):
+    def get_json(self, url, tentativas=6):
         for t in range(tentativas):
             self._vez()
             try:
@@ -108,20 +108,20 @@ class Net:
                         r = self.sess.get(url, timeout=15, headers=HEADERS)     # com cabeçalhos de navegador
                 if r.status_code == 429:
                     try:
-                        pausa = min(max(float(r.headers.get("Retry-After", "")), 1.0), 30.0)
+                        pausa = min(max(float(r.headers.get("Retry-After", "")), 1.0), 90.0)
                     except Exception:
-                        pausa = 2.0 * (t + 1)
-                    self.pausa_ate = max(self.pausa_ate, time.time() + pausa)
+                        pausa = min(4.0 * (2 ** t), 60.0)                       # 4s, 8s, 16s, 32s, 60s...
+                    self.pausa_ate = max(self.pausa_ate, time.time() + pausa)   # pausa GLOBAL: ninguém insiste junto
                     self.n429 += 1
-                    self.intervalo = min(max(self.intervalo * 1.3, 0.1), 0.5)   # espaça um pouco as próximas
+                    self.intervalo = min(max(self.intervalo * 1.5, 0.3), 3.0)   # e as próximas ficam mais espaçadas
                     self.erro = "HTTP 429 – o site limitou as requisições"
                     continue
                 if r.status_code != 200:
                     self.erro = f"HTTP {r.status_code} – {r.text[:120]!r}"
                 else:
                     try:
-                        if self.intervalo > self.base:                          # o site aliviou: volta a acelerar
-                            self.intervalo = max(self.base, self.intervalo * 0.9)
+                        if self.intervalo > self.base:                          # o site aliviou: acelera devagar
+                            self.intervalo = max(self.base, self.intervalo * 0.97)
                         return r.json()
                     except ValueError:
                         self.erro = f"resposta não é JSON – {r.text[:120]!r}"
@@ -417,9 +417,9 @@ def main() -> int:
     ap.add_argument("--ativos", default="opcoes_ativos.txt")
     ap.add_argument("--demo", action="store_true")
     ap.add_argument("--prev-url", default="")
-    ap.add_argument("--workers", type=int, default=12, help="requisições simultâneas ao opcoes.net.br (mais = mais rápido, mais risco de HTTP 429)")
-    ap.add_argument("--intervalo", type=float, default=0.0, help="segundos de espera entre requisições (0 = sem espera; sobe sozinho se o site limitar)")
-    ap.add_argument("--max-min", type=float, default=10.0, help="tempo máximo da coleta de opções, em minutos")
+    ap.add_argument("--workers", type=int, default=6, help="requisições simultâneas ao opcoes.net.br (mais = mais rápido, mais risco de HTTP 429)")
+    ap.add_argument("--intervalo", type=float, default=0.25, help="segundos de espera entre requisições (0 = sem espera; sobe sozinho se o site limitar)")
+    ap.add_argument("--max-min", type=float, default=14.0, help="tempo máximo da coleta de opções, em minutos")
     ap.add_argument("--hv-yahoo", action="store_true", help="opcional: baixa histórico no Yahoo para HV/candles (padrão: desligado)")
     ap.add_argument("--diag", default="", help="só diagnóstico: mostra as linhas cruas da API para o ativo (ex.: --diag PETR4)")
     ap.add_argument("--only", default="", help="só estes ativos, separados por vírgula (ex.: PETR4,VALE3)")
