@@ -1,5 +1,5 @@
 """
-Opcoes_B3 — coleta de dados de OPÇÕES (Wheel / Calls longas). Projeto independente do scanner SMC.
+Opcoes_B3 — coleta de dados de OPÇÕES (Wheel / Calls longas). Projeto 100% independente (não usa o Smc_B3).
 
   - cotações de opções ........ opcoes.net.br  (mesmo endpoint do seu listar_opcoes; requisições simples em paralelo)
   - preço do ativo ............ estimado pelas próprias opções (paridade put-call); nenhum outro site é usado
@@ -266,7 +266,7 @@ def historicos_yahoo(ativos, max_seg=120):
 
 def estimar_spot(rows, hoje, selic):
     """Preço do ativo estimado só pelas opções (paridade put-call: C - P = S - K·e^(-rT)), usando os pares
-    mais próximos de 'no dinheiro'. Plano C: só é usado se não houver histórico do SMC. None se faltar dado."""
+    mais próximos de 'no dinheiro'. Plano C: só é usado se não houver histórico de preços. None se faltar dado."""
     r = math.log(1 + selic)
     calls, puts = {}, {}
     for t, venc, tipo, k, p, neg, ult, vol in rows:
@@ -456,9 +456,9 @@ def main() -> int:
     ap.add_argument("--workers", type=int, default=6, help="requisições simultâneas ao opcoes.net.br (mais = mais rápido, mais risco de HTTP 429)")
     ap.add_argument("--intervalo", type=float, default=0.25, help="segundos de espera entre requisições (0 = sem espera; sobe sozinho se o site limitar)")
     ap.add_argument("--max-min", type=float, default=14.0, help="tempo máximo da coleta de opções, em minutos")
-    ap.add_argument("--wheel-top", type=int, default=0, help="além de opcoes_ativos.txt, coleta as N ações mais líquidas do Smc_B3 (só para o Wheel)")
-    ap.add_argument("--wheel-dte", type=int, default=45, help="para esses ativos extras, só vencimentos até N dias (padrão 45)")
-    ap.add_argument("--hist-url", default="", help="endereço do site Smc_B3 (GitHub Pages) para reaproveitar candles/HV, sem Yahoo")
+    ap.add_argument("--top", type=int, default=0, help="entre os candidatos de opcoes_ativos.txt, mantém só os N mais líquidos EM OPÇÕES (volume negociado no opcoes.net.br); 0 = todos")
+    ap.add_argument("--wheel-dte", type=int, default=45, help="na triagem de liquidez (--top) olha só vencimentos até N dias; as LEAPS dos N escolhidos são baixadas depois")
+    ap.add_argument("--hist-url", default="", help="opcional: endereço de outro site (GitHub Pages) com candles já publicados; não é usado por padrão")
     ap.add_argument("--hv-yahoo", action="store_true", help="opcional: baixa histórico no Yahoo para HV/candles (padrão: desligado)")
     ap.add_argument("--diag", default="", help="só diagnóstico: mostra as linhas cruas da API para o ativo (ex.: --diag PETR4)")
     ap.add_argument("--only", default="", help="só estes ativos, separados por vírgula (ex.: PETR4,VALE3)")
@@ -476,12 +476,6 @@ def main() -> int:
     if args.only:
         pedidos = [t.strip().upper() for t in args.only.split(",") if t.strip()]
         ativos = [t for t in pedidos if t in ativos] or pedidos
-    dte_lim = {}
-    if args.wheel_top and args.hist_url and not args.demo and not args.only:
-        for t in liquidos_smc(args.hist_url, args.wheel_top):
-            if t not in ativos:
-                ativos.append(t)
-                dte_lim[t] = args.wheel_dte
     print(f"Opções: {len(ativos)} ativos ({'DEMO' if args.demo else 'reais'})")
 
     selic, selic_data = (SELIC_PADRAO, "demo") if args.demo else selic_bcb()
@@ -518,32 +512,17 @@ def main() -> int:
 
     rows_por = {a: [] for a in ativos}
     erro_ativo = {}
-    hists = {a: historico(a) for a in ativos}
-    if args.hist_url and not args.demo:
-        hists.update(historicos_url(args.hist_url, ativos))
-    if args.hv_yahoo and not args.demo:
-        hists.update(historicos_yahoo([a for a in ativos if hists[a] is None]))
-    sem_hv = [a for a in ativos if hists[a] is None]
-    if sem_hv and not args.demo:
-        print(f"  [info] sem HV/candles (preço pela paridade put-call) em {len(sem_hv)} ativo(s); use --hist-url (site do Smc_B3) ou --hv-yahoo para ter HV.", flush=True)
+    liquidos = []
+    hists = {}
 
-    if args.demo:
-        for a in ativos:
-            S, _, _, hv = estatisticas(hists[a])
-            rows_por[a] = demo_opcoes(a, S, hv, hoje)
-    else:
-        t1 = time.time()
+    def coletar(pares):
+        """Baixa (ativo, vencimento) em paralelo. Devolve os pares que falharam."""
+        falhou = []
+        if not pares:
+            return falhou
+        t1, passo = time.time(), max(1, len(pares) // 5)
         with ThreadPoolExecutor(max_workers=args.workers) as ex:
-            f_venc = {a: ex.submit(vencimentos, net, a) for a in ativos}
-            tarefas = []
-            for a in ativos:
-                vs = vencimentos_validos(f_venc[a].result(), hoje, dte_lim.get(a, DTE_MAX))
-                if not vs:
-                    erro_ativo[a] = net.erro or "nenhum vencimento retornado"
-                tarefas += [(a, v) for v in vs]
-            print(f"  {len(tarefas)} vencimentos em {total} ativos (lista em {time.time() - t1:.0f}s); baixando em paralelo...", flush=True)
-            futs = {ex.submit(baixar_venc, net, a, v): (a, v) for a, v in tarefas}
-            falhou, n_ok, passo = [], 0, max(1, len(tarefas) // 5)
+            futs = {ex.submit(baixar_venc, net, a, v): (a, v) for a, v in pares}
             try:
                 for k, f in enumerate(as_completed(futs, timeout=max(30.0, prazo - time.time())), 1):
                     a, v = futs[f]
@@ -552,9 +531,8 @@ def main() -> int:
                         falhou.append((a, v))
                     else:
                         rows_por[a].extend(r)
-                        n_ok += 1
-                    if k % passo == 0 or k == len(tarefas):
-                        print(f"    {k}/{len(tarefas)} vencimentos ({time.time() - t1:.0f}s)", flush=True)
+                    if k % passo == 0 or k == len(pares):
+                        print(f"    {k}/{len(pares)} vencimentos ({time.time() - t1:.0f}s)", flush=True)
             except TimeoutError:
                 pend = [av for f, av in futs.items() if not f.done()]
                 print(f"  [aviso] tempo máximo atingido; {len(pend)} vencimento(s) ficaram sem baixar.", flush=True)
@@ -562,7 +540,56 @@ def main() -> int:
                     f.cancel()
                 for a_, v_ in pend:
                     erro_ativo.setdefault(a_, "tempo esgotado em alguns vencimentos")
-        if falhou and time.time() < prazo:                   # 2ª passada, mais devagar, só dos que falharam
+        return falhou
+
+    def carregar_hist(lista):
+        h = {a: historico(a) for a in lista}
+        if args.hist_url and not args.demo:
+            h.update(historicos_url(args.hist_url, lista))
+        if args.hv_yahoo and not args.demo:
+            h.update(historicos_yahoo([a for a in lista if h[a] is None]))
+        sem = [a for a in lista if h[a] is None]
+        if sem and not args.demo:
+            print(f"  [info] sem HV/candles (preço pela paridade put-call) em {len(sem)} ativo(s); use --hv-yahoo para ter HV.", flush=True)
+        return h
+
+    if args.demo:
+        hists = carregar_hist(ativos)
+        for a in ativos:
+            S, _, _, hv = estatisticas(hists[a])
+            rows_por[a] = demo_opcoes(a, S, hv, hoje)
+    else:
+        t1 = time.time()
+        with ThreadPoolExecutor(max_workers=args.workers) as ex:
+            f_venc = {a: ex.submit(vencimentos, net, a) for a in ativos}
+            venc_por = {}
+            for a in ativos:
+                venc_por[a] = vencimentos_validos(f_venc[a].result(), hoje, DTE_MAX)
+                if not venc_por[a]:
+                    erro_ativo[a] = net.erro or "nenhum vencimento retornado"
+        dias = lambda v: (pd.to_datetime(v).normalize() - hoje).days
+        print(f"  vencimentos listados em {time.time() - t1:.0f}s", flush=True)
+        if args.top:
+            # 1ª etapa: triagem de liquidez só com os vencimentos curtos (rápido)
+            print(f"  triagem de liquidez: {len(ativos)} candidatos, vencimentos até {args.wheel_dte} dias...", flush=True)
+            falhou = coletar([(a, v) for a in ativos for v in venc_por[a] if dias(v) <= args.wheel_dte])
+            volume = {a: sum(r[7] for r in rows_por[a]) for a in ativos}
+            liquidos = sorted([a for a in ativos if rows_por[a]], key=lambda a: -volume[a])
+            sem_dados = [a for a in ativos if not rows_por[a]]
+            if sem_dados:
+                print(f"  [info] {len(sem_dados)} candidato(s) sem opções negociadas ou sem opções listadas (ignorados): {', '.join(sem_dados)}", flush=True)
+            ativos = liquidos[:args.top]
+            print(f"  mantidos os {len(ativos)} mais líquidos em opções: {', '.join(ativos)}", flush=True)
+            for a in list(rows_por):
+                if a not in ativos:
+                    del rows_por[a]
+            # 2ª etapa: vencimentos longos (LEAPS) só dos escolhidos
+            falhou = [x for x in falhou if x[0] in rows_por]
+            falhou += coletar([(a, v) for a in ativos for v in venc_por[a] if dias(v) > args.wheel_dte])
+        else:
+            falhou = coletar([(a, v) for a in ativos for v in venc_por[a]])
+        hists = carregar_hist(ativos)
+        if falhou and time.time() < prazo:                   # nova passada, mais devagar, só dos que falharam
             print(f"  refazendo {len(falhou)} vencimento(s) que falharam, em ritmo mais lento...", flush=True)
             net.intervalo = max(net.intervalo, 0.3)
             net.pausa_ate = 0.0
@@ -572,6 +599,7 @@ def main() -> int:
                         erro_ativo.setdefault(a, f"vencimento {v}: {net.erro}")
                     else:
                         rows_por[a].extend(r)
+    total = len(ativos)
 
     for k, ativo in enumerate(ativos, 1):
         try:
@@ -600,7 +628,7 @@ def main() -> int:
         "updated_at": agora.isoformat(timespec="seconds"),
         "updated_brt": (agora - timedelta(hours=3)).strftime("%d/%m/%Y %H:%M"),
         "selic": selic, "selic_fonte": fonte_selic, "selic_data": selic_data,
-        "demo": bool(args.demo), "ativos": lista, "falhas": falhas, "falhas_motivo": motivos, "sem_hv": [a for a in ativos if hists.get(a) is None], "seconds": round(time.time() - t0, 1),
+        "demo": bool(args.demo), "ativos": lista, "falhas": falhas, "falhas_motivo": motivos, "liquidos": liquidos or [x["t"] for x in lista], "sem_hv": [a for a in ativos if hists.get(a) is None], "seconds": round(time.time() - t0, 1),
         "erro": "" if lista else (net.erro or "nenhum ativo coletado"),
     }
     dump(os.path.join(out, "meta.json"), meta)
