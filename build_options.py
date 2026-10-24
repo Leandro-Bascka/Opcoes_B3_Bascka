@@ -182,14 +182,14 @@ def _eh_data(x):
     return isinstance(x, str) and len(x) >= 8 and x[:4].isdigit() and "-" in x[:8] or (isinstance(x, str) and "/" in x[:6])
 
 
-def vencimentos_validos(lista, hoje):
+def vencimentos_validos(lista, hoje, dte_max=DTE_MAX):
     out = []
     for v in lista:
         try:
             dias = (pd.to_datetime(v).normalize() - hoje).days
         except Exception:
             continue
-        if 1 <= dias <= DTE_MAX:
+        if 1 <= dias <= dte_max:
             out.append(v)
     return out
 
@@ -202,6 +202,18 @@ def hv_anual(close, n):
     if len(ret) < 10:
         return float("nan")
     return float(ret.tail(n).std() * np.sqrt(252))
+
+
+def liquidos_smc(base, n):
+    """As n ações mais líquidas, na ordem de liquidez, lidas do site do Smc_B3 (data/meta.json -> 'liquidos')."""
+    try:
+        r = requests.get(f"{base.rstrip('/')}/data/meta.json", timeout=20)
+        lst = [str(t).upper() for t in (r.json().get("liquidos") or [])]
+        print(f"  mais líquidas (Smc_B3): {min(n, len(lst))} de {len(lst)} disponíveis", flush=True)
+        return lst[:n]
+    except Exception as e:  # noqa: BLE001
+        print(f"  [aviso] não consegui ler a lista de liquidez do Smc_B3 ({type(e).__name__}); usando só opcoes_ativos.txt", flush=True)
+        return []
 
 
 def historicos_url(base, ativos):
@@ -444,6 +456,8 @@ def main() -> int:
     ap.add_argument("--workers", type=int, default=6, help="requisições simultâneas ao opcoes.net.br (mais = mais rápido, mais risco de HTTP 429)")
     ap.add_argument("--intervalo", type=float, default=0.25, help="segundos de espera entre requisições (0 = sem espera; sobe sozinho se o site limitar)")
     ap.add_argument("--max-min", type=float, default=14.0, help="tempo máximo da coleta de opções, em minutos")
+    ap.add_argument("--wheel-top", type=int, default=0, help="além de opcoes_ativos.txt, coleta as N ações mais líquidas do Smc_B3 (só para o Wheel)")
+    ap.add_argument("--wheel-dte", type=int, default=45, help="para esses ativos extras, só vencimentos até N dias (padrão 45)")
     ap.add_argument("--hist-url", default="", help="endereço do site Smc_B3 (GitHub Pages) para reaproveitar candles/HV, sem Yahoo")
     ap.add_argument("--hv-yahoo", action="store_true", help="opcional: baixa histórico no Yahoo para HV/candles (padrão: desligado)")
     ap.add_argument("--diag", default="", help="só diagnóstico: mostra as linhas cruas da API para o ativo (ex.: --diag PETR4)")
@@ -462,6 +476,12 @@ def main() -> int:
     if args.only:
         pedidos = [t.strip().upper() for t in args.only.split(",") if t.strip()]
         ativos = [t for t in pedidos if t in ativos] or pedidos
+    dte_lim = {}
+    if args.wheel_top and args.hist_url and not args.demo and not args.only:
+        for t in liquidos_smc(args.hist_url, args.wheel_top):
+            if t not in ativos:
+                ativos.append(t)
+                dte_lim[t] = args.wheel_dte
     print(f"Opções: {len(ativos)} ativos ({'DEMO' if args.demo else 'reais'})")
 
     selic, selic_data = (SELIC_PADRAO, "demo") if args.demo else selic_bcb()
@@ -517,7 +537,7 @@ def main() -> int:
             f_venc = {a: ex.submit(vencimentos, net, a) for a in ativos}
             tarefas = []
             for a in ativos:
-                vs = vencimentos_validos(f_venc[a].result(), hoje)
+                vs = vencimentos_validos(f_venc[a].result(), hoje, dte_lim.get(a, DTE_MAX))
                 if not vs:
                     erro_ativo[a] = net.erro or "nenhum vencimento retornado"
                 tarefas += [(a, v) for v in vs]

@@ -19,7 +19,7 @@
   const PRESETS = { SAFE: [0.10, 0.25], WHEEL: [0.20, 0.32], AGRESSIVO: [0.25, 0.55], RENDA: [0.08, 0.20] };
   const DEFAULTS = {
     mode: "wheel",
-    wheel: { ativo: "PETR4", modo: "WHEEL", dteMin: 7, dteMax: 60, negMin: 10, range: "10%", premio: "3%",
+    wheel: { ativo: "PETR4", modo: "WHEEL", dteMin: 7, dteMax: 45, negMin: 10, range: "10%", premio: "3%",
              putMin: 0.20, putMax: 0.32, callMin: 0.20, callMax: 0.32 },
     long: { todos: true, ativo: "PETR4", range: "10%", premio: "8%", desc: 10, neg: 3, top: 15 },
     model: { selicAuto: true, selic: 14, alvoAlta: 20, premioMin: 0.03, idadeMax: 4, idadeMaxLong: 10 }
