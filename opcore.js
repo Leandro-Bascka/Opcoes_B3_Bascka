@@ -211,25 +211,36 @@
   }
 
   // ---- scanner de calls longas (equivale a processar_ativo()) ----
-  function scanLong(A, p, cfg, hojeMs) {
+  function scanLong(A, p, cfg, hojeMs, funil) {
     const out = [];
     const S = A.S, hv = A.hv;
-    if (!Number.isFinite(hv)) return out;    // sem HV não há como medir "desconto"
+    const f = funil || {};
+    const cnt = k => { f[k] = (f[k] || 0) + 1; };
+    if (!Number.isFinite(hv)) { f["ativo sem HV"] = (f["ativo sem HV"] || 0) + 1; return out; }   // sem HV não há como medir "desconto"
     const faixa = valorOuPct(p.range, S), premioMax = valorOuPct(p.premio, S);
     const descMin = p.desc / 100, r = taxaCont(cfg.selic);
+    const dMin = Number.isFinite(p.dteMin) ? p.dteMin : 60, dMax = Number.isFinite(p.dteMax) ? p.dteMax : 730;
     for (const o of A.rows) {
       if (o.tipo !== "CALL") continue;
+      cnt("calls lidas");
       const { strike, preco: premio } = o;
       if (premio < cfg.PREMIO_MIN || premio > premioMax) continue;
+      cnt("prêmio");
       if (!(S - faixa <= strike && strike <= S + faixa)) continue;
+      cnt("strike");
       if (o.neg < p.neg) continue;
+      cnt("negócios");
       const idade = idadeDias(o.ult, hojeMs);
       if (idade != null && idade > cfg.IDADE_MAX_LONGAS) continue;
+      cnt("preço atual");
       const dias = Math.round((dateMs(o.venc) - hojeMs) / DAY);
-      if (!(dias >= 60 && dias <= 730)) continue;
+      if (!(dias >= dMin && dias <= dMax)) continue;
+      cnt("DTE");
       const m = avaliarCallLonga(S, strike, premio, dias, r, hv, o.neg, cfg);
       if (m == null || m.iv > 1.6) continue;
+      cnt("IV válida");
       if (!Number.isFinite(m.desc) || m.desc < descMin) continue;
+      cnt("desconto HV");
       const dist = (strike - S) / S * 100;
       const oi = 0;   // a fonte (opcoes.net.br) não traz interesse aberto; 🐋 🟣 🧲 dependem de OI e ficam inativos
       let sinal = "";
