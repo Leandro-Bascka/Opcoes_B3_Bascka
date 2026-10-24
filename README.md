@@ -11,7 +11,7 @@ Portado do seu *Scanner Wheel V.2*, sem mudar a lógica (Black-Scholes, IV, delt
 
 ## De onde vêm os dados (nenhuma dependência do SMC)
 - **Opções**: opcoes.net.br, mesmos campos do seu `listar_opcoes` (`i[0]` ticker, `i[2]` tipo, `i[5]` strike, `i[7]` último, `i[8]` negócios, `i[9]` volume, `i[10]` data). Só entram opções com negócios e volume. Requisições em paralelo (12).
-- **Preço do ativo**: estimado pelas próprias opções (paridade put-call). Nenhum outro site é usado.
+- **Preço do ativo, candles e HV**: reaproveitados do site do **Smc_B3** (`--hist-url`, GitHub Pages; sem Yahoo). Ativos fora do scanner SMC têm o preço estimado pelas opções (paridade put-call) e ficam sem HV/candles. Publique o Smc_B3 antes.
 - **HV**: **desligada por padrão** (não há fonte de histórico além do Yahoo). Sem HV, a coluna IV/HV e as *calls longas* (desconto vs HV) ficam indisponíveis. Para ligar: `python build_options.py --out site --hv-yahoo` (opcional; para sozinho se o Yahoo limitar). No GitHub, acrescente `--hv-yahoo` ao comando do workflow.
 - **Selic**: BCB.
 

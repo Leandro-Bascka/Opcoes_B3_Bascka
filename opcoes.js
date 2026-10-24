@@ -42,7 +42,7 @@
   let cur = { put: [], call: [], long: [] }, sel = null;
   // varredura da B3 (aba Wheel)
   const TOPN = 15, TOPP = 8;
-  let view = "scan", SCANA = null, scanning = false, scanDone = 0, showCalls = false;
+  let RANK = [], view = "scan", SCANA = null, scanning = false, scanDone = 0, showCalls = false;
   let ch = null, cs = null, vs = null, e9 = null, vw = null, projS = [], lines = [], chAtivo = null;
 
   async function jget(path, bust) {
@@ -143,9 +143,20 @@
     const v = P[s][k];
     return `<label>${label}<input data-s="${s}" data-k="${k}" data-t="${o.t || "s"}" class="${o.cls || ""}" value="${esc(v)}" inputmode="${o.t === "s" ? "text" : "decimal"}" autocomplete="off"></label>`;
   };
+  function assetOptions(s) {
+    const op = (t, txt) => `<option value="${t}"${P[s].ativo === t ? " selected" : ""}>${txt}</option>`;
+    const todos = (META.ativos || []).map(a => a.t);
+    if (s !== "wheel" || !RANK.length) return todos.map(t => op(t, t)).join("");
+    const nos = new Set(RANK.map(r => r.t));           // depois da varredura: os melhores primeiro, na ordem do ranking
+    return `<optgroup label="🏆 Melhores PUTs da B3 (varredura)">${RANK.map((r, k) => op(r.t, `${k + 1}. ${r.t} · nota ${F1.format(r.score)} · ${r.n} PUT${r.n > 1 ? "s" : ""}`)).join("")}</optgroup>` +
+           `<optgroup label="Demais ativos">${todos.filter(t => !nos.has(t)).map(t => op(t, t)).join("")}</optgroup>`;
+  }
   function assetSelect(s) {
-    const opts = (META.ativos || []).map(a => `<option value="${a.t}"${P[s].ativo === a.t ? " selected" : ""}>${a.t}</option>`).join("");
-    return `<label>Ativo<select data-s="${s}" data-k="ativo" data-t="sel">${opts}</select></label>`;
+    return `<label>Ativo<select data-s="${s}" data-k="ativo" data-t="sel">${assetOptions(s)}</select></label>`;
+  }
+  function fillWheelSelect() {                          // atualiza só as opções do combo (não mexe nos campos que estão sendo editados)
+    const el = document.querySelector('#opCtrl select[data-s="wheel"][data-k="ativo"]');
+    if (el) el.innerHTML = assetOptions("wheel");
   }
   function renderCtrl() {
     document.querySelectorAll("#opTabs button").forEach(b => b.classList.toggle("on", b.dataset.m === P.mode));
@@ -372,6 +383,7 @@
     if (my !== runId) return;
     rows.sort((a, b) => b.best.score - a.best.score || b.avg - a.avg);
     const top = rows.slice(0, TOPN);
+    RANK = top.map(r => ({ t: r.t, score: r.best.score, n: r.n })); fillWheelSelect();
     setStatus(`Varredura: <b>${analisados}</b> ativos analisados · <b>${rows.length}</b> têm PUTs dentro dos filtros · mostrando os ${top.length} melhores`);
     const li = top.map((r, k) => {
       const o = r.best;
@@ -479,7 +491,7 @@
     const m = await jget("meta.json");
     const changed = META && META.updated_at !== m.updated_at;
     META = m;
-    if (changed) { LONG = null; SCANA = null; for (const k in cacheA) delete cacheA[k]; for (const k in cacheP) delete cacheP[k]; chAtivo = null; }
+    if (changed) { LONG = null; SCANA = null; RANK = []; for (const k in cacheA) delete cacheA[k]; for (const k in cacheP) delete cacheP[k]; chAtivo = null; }
     return changed;
   }
   async function show() {
