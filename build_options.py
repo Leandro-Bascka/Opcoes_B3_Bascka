@@ -398,6 +398,26 @@ def recuperar_anterior(prev_url, ativo, out):
     return None
 
 
+def restaurar_tudo(prev_url, out, lista):
+    """Se a coleta atual quase não trouxe nada, recupera TODOS os ativos da última coleta boa publicada (marcados 'stale')."""
+    try:
+        r = requests.get(prev_url.rstrip("/") + "/data/opcoes/meta.json", timeout=20)
+        m = r.json()
+    except Exception as e:  # noqa: BLE001
+        print(f"  [aviso] sem coleta anterior para restaurar ({type(e).__name__})", flush=True)
+        return [], []
+    tem = {x["t"] for x in lista}
+    novos = []
+    for x in m.get("ativos", []):
+        if x["t"] in tem:
+            continue
+        ja = recuperar_anterior(prev_url, x["t"], out)
+        if ja:
+            novos.append({"t": x["t"], "n": len(ja["rows"]), "fetched_at": ja.get("fetched_at"), "stale": True})
+    print(f"  restaurados {len(novos)} ativo(s) da última coleta boa publicada", flush=True)
+    return novos, m.get("liquidos", [])
+
+
 def gerar_longas(out, lista):
     """Um único arquivo com só as CALLs de 60–730 dias de todos os ativos: a tela "Calls longas" baixa
     1 arquivo pequeno em vez de um por ativo (muito mais rápido, principalmente no celular)."""
@@ -567,24 +587,28 @@ def main() -> int:
             rows_por[a] = demo_opcoes(a, S, hv, hoje)
     else:
         t1 = time.time()
-        meio = t0 + (prazo - t0) * 0.45                       # triagem de liquidez: no máximo 45% do tempo total
+        meio = t0 + (prazo - t0) * 0.35                       # triagem de liquidez: no máximo 35% do tempo total
         net.deadline = meio if args.top else prazo
-        ex = ThreadPoolExecutor(max_workers=args.workers)
-        f_venc = {a: ex.submit(vencimentos, net, a) for a in ativos}
-        venc_por = {}
-        for a in ativos:
-            try:
-                venc_por[a] = vencimentos_validos(f_venc[a].result(), hoje, DTE_MAX)
-            except Exception:  # noqa: BLE001
-                venc_por[a] = []
-            if not venc_por[a]:
+        # Os vencimentos da B3 são os mesmos para (quase) todas as ações: 1 consulta em vez de 1 por ativo.
+        # Vencimento que não existir para um ativo volta vazio (barato).
+        glob = []
+        for ref in ("PETR4", "VALE3", "ITUB4", "BBAS3"):
+            glob = vencimentos_validos(vencimentos(net, ref), hoje, DTE_MAX)
+            if glob:
+                break
+        venc_por = {a: list(glob) for a in ativos}
+        if not glob:
+            for a in ativos:
                 erro_ativo[a] = net.erro or "nenhum vencimento retornado"
-        ex.shutdown(wait=False, cancel_futures=True)
         dias = lambda v: (pd.to_datetime(v).normalize() - hoje).days
         print(f"  vencimentos listados em {time.time() - t1:.0f}s", flush=True)
         if args.top:
             # 1ª etapa: triagem de liquidez só com os 2 vencimentos curtos mais próximos de cada candidato (rápido)
-            curtos = [(a, v) for a in ativos for v in [x for x in venc_por[a] if dias(x) <= args.wheel_dte][:2]]
+            def _rep(vs):
+                cand = [x for x in vs if dias(x) <= args.wheel_dte]
+                boa = [x for x in cand if dias(x) >= 10]
+                return (boa or cand)[:1]
+            curtos = [(a, v) for a in ativos for v in _rep(venc_por[a])]
             print(f"  triagem de liquidez: {len(ativos)} candidatos, {len(curtos)} vencimentos...", flush=True)
             falhou = coletar(curtos, meio)
             volume = {a: sum(r[7] for r in rows_por[a]) for a in ativos}
@@ -597,10 +621,10 @@ def main() -> int:
             for a in list(rows_por):
                 if a not in ativos:
                     del rows_por[a]
-            # 2ª etapa: vencimentos longos (LEAPS) só dos escolhidos, na ordem de liquidez; no máx. 6 por ativo (os mais longos)
+            # 2ª etapa: vencimentos longos (LEAPS) só dos escolhidos, na ordem de liquidez; no máx. 4 por ativo (os mais longos)
             falhou = [x for x in falhou if x[0] in rows_por]
             lim = max(args.leaps_min, args.wheel_dte + 1)
-            longos = [(a, v) for a in ativos for v in [x for x in venc_por[a] if dias(x) >= lim][-6:]]
+            longos = [(a, v) for a in ativos for v in [x for x in venc_por[a] if dias(x) >= lim][-4:]]
             print(f"  calls longas: {len(longos)} vencimentos...", flush=True)
             falhou += coletar(longos, prazo)
         else:
@@ -640,6 +664,14 @@ def main() -> int:
     if net.n429:
         print(f"[info] o site limitou {net.n429}x (HTTP 429); a coleta desacelerou sozinha.")
 
+    n_frescos = sum(1 for x in lista if not x.get("stale"))
+    if args.prev_url and not args.demo and n_frescos < 5:
+        print(f"[aviso] a coleta trouxe só {n_frescos} ativo(s) novo(s); mantendo também os dados da última coleta boa.", flush=True)
+        novos, liq_prev = restaurar_tudo(args.prev_url, out, lista)
+        lista += novos
+        if not liquidos:
+            liquidos = liq_prev
+        falhas[:] = [t for t in falhas if t not in {x["t"] for x in lista}]
     n_long = gerar_longas(out, lista)
     print(f"longas.json: {n_long} calls de 60 a 730 dias ({os.path.getsize(os.path.join(out, 'longas.json')) // 1024} KB)")
 
