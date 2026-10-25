@@ -21,7 +21,7 @@
     mode: "wheel",
     wheel: { ativo: "PETR4", modo: "WHEEL", dteMin: 7, dteMax: 45, negMin: 10, range: "10%", premio: "3%",
              putMin: 0.20, putMax: 0.32, callMin: 0.20, callMax: 0.32 },
-    long: { todos: true, ativo: "PETR4", range: "20%", premio: "15%", desc: 10, neg: 1, top: 15, dteMin: 365, dteMax: 730 },
+    long: { todos: true, ativo: "PETR4", range: "10%", premio: "8%", desc: 10, neg: 3, top: 15 },
     model: { selicAuto: true, selic: 14, alvoAlta: 20, premioMin: 0.03, idadeMax: 4, idadeMaxLong: 10 }
   };
   const clone = o => JSON.parse(JSON.stringify(o));
@@ -194,9 +194,9 @@
           <label class="chk"><input type="checkbox" data-s="long" data-k="todos" data-t="b"${P.long.todos ? " checked" : ""}>Varrer TODOS os ativos</label>
           ${assetSelect("long")}
           ${fld("long", "range", "Range +/- (R$ ou %)")}${fld("long", "premio", "Prêmio máx (R$ ou %)")}
-          ${fld("long", "dteMin", "DTE mín", { t: "i", cls: "w1" })}${fld("long", "dteMax", "DTE máx", { t: "i", cls: "w1" })}${fld("long", "desc", "Desc HV % mín", { t: "n", cls: "w1" })}${fld("long", "neg", "Neg. mín", { t: "i", cls: "w1" })}${fld("long", "top", "Top", { t: "i", cls: "w1" })}
+          ${fld("long", "desc", "Desc HV % mín", { t: "n", cls: "w1" })}${fld("long", "neg", "Neg. mín", { t: "i", cls: "w1" })}${fld("long", "top", "Top", { t: "i", cls: "w1" })}
         </div>
-        <p class="hint">Calls com vencimento entre DTE mín e DTE máx (padrão: acima de 1 ano, até 730 dias). Ao escolher um ativo, a varredura passa a ser só dele; marque "Varrer TODOS" para voltar a varrer tudo. "Desc HV" = quanto o prêmio está abaixo do preço teórico de Black-Scholes calculado com a volatilidade histórica (HV20/HV60).</p>${model}`);
+        <p class="hint">Calls com vencimento entre 60 e 730 dias. "Desc HV" = quanto o prêmio está abaixo do preço teórico de Black-Scholes calculado com a volatilidade histórica (HV20/HV60).</p>${model}`);
     }
   }
 
@@ -214,7 +214,6 @@
     el.style.borderColor = "";
     P[s][k] = v;
     if (s === "wheel" && k === "ativo") view = "asset";
-    if (s === "long" && k === "ativo" && P.long.todos) { P.long.todos = false; const cb = document.querySelector('#opCtrl input[data-s="long"][data-k="todos"]'); if (cb) cb.checked = false; }
     if (s === "wheel" && ["putMin", "putMax", "callMin", "callMax"].includes(k)) P.wheel.modo = "";
     save();
     if (s === "model" && k === "selicAuto") renderCtrl();
@@ -261,18 +260,6 @@
       `Opções que sobraram após cada filtro:\n${linhas.join("\n")}` + (culpado ? `\n\nO filtro que zerou foi '${culpado[0]}': ${DICAS[culpado[0]] || ""}.` : "");
   }
 
-  function textoFunilLong(f, n) {
-    const ordem = ["calls lidas", "prêmio", "strike", "negócios", "preço atual", "DTE", "IV válida", "desconto HV"];
-    const dicas = { "prêmio": "aumente 'Prêmio máx'", "strike": "aumente 'Range +/-' (para LEAPS, 15–25% costuma ser melhor)", "negócios": "reduza 'Neg. mín'",
-      "preço atual": "as calls não negociam há dias (veja 'Idade máx. preço longas')", "DTE": "não há calls com negócio nesse prazo; reduza 'DTE mín' (ex.: 180) — LEAPS negociam pouco no opcoes.net.br",
-      "IV válida": "prêmios inconsistentes", "desconto HV": "reduza 'Desc HV % mín'" };
-    const linhas = ordem.map(k => `${k}: ${f[k] || 0}`);
-    const culpado = ordem.find(k => k !== "calls lidas" && !f[k]);
-    const maior = f.maiorDte ? `\nMaior prazo com negócio nas calls que passaram até aqui: ${f.maiorDte} dias.` : "";
-    return `Nenhuma call passou nos filtros (${n} ativo(s) varridos${f["ativo sem HV"] ? `, ${f["ativo sem HV"]} sem HV` : ""}).\n\nOpções que sobraram após cada filtro:\n${linhas.join("\n")}${maior}` +
-      (culpado ? `\n\nO filtro que zerou foi '${culpado}': ${dicas[culpado] || ""}.` : "");
-  }
-
   function setStatus(extra) {
     const si = selicInfo();
     const old = META && META.updated_at && (Date.now() - new Date(META.updated_at).getTime() > 26 * 3600e3);
@@ -309,7 +296,7 @@
         await showAsset(A.ativo, null);
       } else {
         const todos = P.long.todos, list = todos ? META.ativos.map(a => a.t) : [P.long.ativo];
-        const out = []; let done = 0, fail = 0; const fn = {};
+        const out = []; let done = 0, fail = 0;
         const LG = await loadLong(); if (my !== runId) return;
         const prog = () => { tb.innerHTML = `<div class="op-card"><div class="empty-msg">Carregando opções… ${done}/${list.length}</div><div class="prog"><s style="width:${done / list.length * 100}%"></s></div></div>`; };
         prog();
@@ -319,7 +306,7 @@
             const t = list[i++];
             try {
               const A = LG ? LG[t] : await loadAsset(t);
-              if (A) out.push(...C.scanLong(A, P.long, c, A.hojeMs, fn)); else if (!LG) throw new Error("sem dados");
+              if (A) out.push(...C.scanLong(A, P.long, c, A.hojeMs)); else if (!LG) throw new Error("sem dados");
             } catch (e) { fail++; if (/inválido|vazio/.test(e.message)) throw e; }
             done++; if (my === runId && done < list.length) prog();
           }
@@ -332,12 +319,12 @@
         cur = { put: [], call: [], long: top }; sel = null;
         const semHv = LG ? list.filter(t => LG[t] && !Number.isFinite(LG[t].hv)).length : 0;
         setStatus(`Varridos <b>${list.length - fail}</b> ativo(s) · <b>${out.length}</b> calls passaram nos filtros · mostrando as ${top.length} melhores` +
-          (semHv ? ` <span class="warn">· ${semHv} ativo(s) sem HV: ranqueados sem o desconto (coluna Desc% = n/d)</span>` : ""));
+          (semHv ? ` <span class="warn">· ${semHv} ativo(s) sem HV não entram no desconto vs HV</span>` : ""));
         const cols = ["#", "Opção", "Ativo", "Strike", "Prêmio", "Desc%", "IV%", "PoP%", `ROI(+${P.model.alvoAlta}%)`, "Score", "Sinal", "Venc", "DTE", "IV/HV"];
-        const rows = top.map((o, k) => [k + 1, esc(o.ticker), esc(o.ativo), F2.format(o.strike), F2.format(o.preco), Number.isFinite(o.desc) ? F1.format(o.desc * 100) : "n/d", F1.format(o.iv * 100),
+        const rows = top.map((o, k) => [k + 1, esc(o.ticker), esc(o.ativo), F2.format(o.strike), F2.format(o.preco), F1.format(o.desc * 100), F1.format(o.iv * 100),
           F1.format(o.pop * 100), F2.format(o.roi), F1.format(o.score), o.sinal || "—", ddmmyy(o.venc), o.dias, fx(o.ivHv)]);
         tb.innerHTML = `<div class="op-card"><h3><span>Melhores calls longas</span></h3>${top.length ? table(cols, rows, "long", 9) :
-          `<div class="empty-msg">${esc(textoFunilLong(fn, list.length - fail))}</div>`}</div>
+          '<div class="empty-msg">0 resultados — aumente Range/Prêmio máx ou reduza Desc HV% / Neg. mín.</div>'}</div>
           <div class="op-card"><h3>Sinais</h3><div class="sig-leg">
             <div>💎 <b>Opção barata</b> — IV/HV ≤ 0,9 e desconto ≥ 15% vs Black-Scholes pela HV.</div>
             <div>🚀 <b>Explosão</b> — IV &lt; 32%, strike a menos de 5% do preço e mais de 120 dias.</div>

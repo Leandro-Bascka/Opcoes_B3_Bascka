@@ -1,59 +1,30 @@
-# CANDIDATOS: tickers que têm opções na B3 (um por linha). Não precisa ordenar.
-# A cada coleta o sistema mede o volume negociado em OPÇÕES de cada candidato (no próprio opcoes.net.br)
-# e mantém só os N mais líquidos (--top no workflow). Ticker sem opções ou deslistado é ignorado sozinho.
-# Para incluir um papel novo, é só acrescentar uma linha (cada candidato a mais custa 1 requisição).
+# Ativos da aba "Opções" (um por linha). Edite e dê push: a próxima atualização horária já usa a nova lista.
+# Quanto mais ativos, mais demorada a coleta (≈ 20–30 s por ativo, por causa do limite de requisições do site).
 ABEV3
-ASAI3
-AZUL4
 B3SA3
 BBAS3
 BBDC4
 BBSE3
-BEEF3
-BPAC11
 BRAP4
-BRFS3
-BRKM5
-CASH3
-CCRO3
 CMIG4
-COGN3
-CPLE6
-CRFB3
-CSAN3
+CPLE3
 CSNA3
 CYRE3
-ELET3
-ELET6
-EMBR3
-ENEV3
+DIRR3
+EGIE3
 EQTL3
+EZTC3
 GGBR4
-GOAU4
 HAPV3
-HYPE3
 ITSA4
 ITUB4
-JBSS3
-KLBN11
-LREN3
-MGLU3
-MRFG3
-MRVE3
-PETR3
 PETR4
 PRIO3
-RADL3
-RAIL3
-RDOR3
-RENT3
 SANB11
-SBSP3
+SOJA3
 SUZB3
-TIMS3
+TAEE11
 USIM5
 VALE3
 VBBR3
-VIVT3
 WEGE3
-YDUQ3
