@@ -166,11 +166,14 @@
     const distBe = ((K + premio) / S - 1) * 100;
     const sDesc = Number.isFinite(desc) ? clip(desc / 0.40) : 0;
     const sPop = clip(pop / 0.50);
-    const sIv = Number.isFinite(ivHv) ? clip((1.1 - ivHv) / 0.6) : cfg.HV_NEUTRA;
+    const temHv = Number.isFinite(desc);
+    // com HV: IV relativa à HV; sem HV: quanto menor a IV absoluta (referência 60%), melhor
+    const sIv = Number.isFinite(ivHv) ? clip((1.1 - ivHv) / 0.6) : (temHv ? cfg.HV_NEUTRA : clip((0.6 - iv) / 0.4));
     const sRoi = clip(roi / 3);
     const sLiq = liqScore(negocios);
-    const score = 100 * (0.30 * sDesc + 0.20 * sPop + 0.15 * sIv + 0.15 * sRoi + 0.20 * sLiq);
-    return { iv, delta, pop, desc, roi, ivHv, distBe, score: round(score, 2) };
+    const score = temHv ? 100 * (0.30 * sDesc + 0.20 * sPop + 0.15 * sIv + 0.15 * sRoi + 0.20 * sLiq)
+                        : 100 * (0.20 * sPop + 0.15 * sIv + 0.15 * sRoi + 0.20 * sLiq) / 0.70;   // sem HV: reescala os demais pesos
+    return { iv, delta, pop, desc, roi, ivHv, distBe, semHv: !temHv, score: round(score, 2) };
   }
 
   // ---- scanner de venda (equivale a buscar()) ----
@@ -216,7 +219,8 @@
     const S = A.S, hv = A.hv;
     const f = funil || {};
     const cnt = k => { f[k] = (f[k] || 0) + 1; };
-    if (!Number.isFinite(hv)) { f["ativo sem HV"] = (f["ativo sem HV"] || 0) + 1; return out; }   // sem HV não há como medir "desconto"
+    const temHv = Number.isFinite(hv);
+    if (!temHv) f["ativo sem HV"] = (f["ativo sem HV"] || 0) + 1;     // sem HV: ranqueia por IV, PoP, ROI e liquidez (sem o desconto)
     const faixa = valorOuPct(p.range, S), premioMax = valorOuPct(p.premio, S);
     const descMin = p.desc / 100, r = taxaCont(cfg.selic);
     const dMin = Number.isFinite(p.dteMin) ? p.dteMin : 60, dMax = Number.isFinite(p.dteMax) ? p.dteMax : 730;
@@ -234,12 +238,13 @@
       if (idade != null && idade > cfg.IDADE_MAX_LONGAS) continue;
       cnt("preço atual");
       const dias = Math.round((dateMs(o.venc) - hojeMs) / DAY);
+      if (dias > (f.maiorDte || 0)) f.maiorDte = dias;
       if (!(dias >= dMin && dias <= dMax)) continue;
       cnt("DTE");
       const m = avaliarCallLonga(S, strike, premio, dias, r, hv, o.neg, cfg);
       if (m == null || m.iv > 1.6) continue;
       cnt("IV válida");
-      if (!Number.isFinite(m.desc) || m.desc < descMin) continue;
+      if (temHv && (!Number.isFinite(m.desc) || m.desc < descMin)) continue;
       cnt("desconto HV");
       const dist = (strike - S) / S * 100;
       const oi = 0;   // a fonte (opcoes.net.br) não traz interesse aberto; 🐋 🟣 🧲 dependem de OI e ficam inativos

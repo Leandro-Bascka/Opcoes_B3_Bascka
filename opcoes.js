@@ -21,7 +21,7 @@
     mode: "wheel",
     wheel: { ativo: "PETR4", modo: "WHEEL", dteMin: 7, dteMax: 45, negMin: 10, range: "10%", premio: "3%",
              putMin: 0.20, putMax: 0.32, callMin: 0.20, callMax: 0.32 },
-    long: { todos: true, ativo: "PETR4", range: "10%", premio: "8%", desc: 10, neg: 3, top: 15, dteMin: 365, dteMax: 730 },
+    long: { todos: true, ativo: "PETR4", range: "20%", premio: "15%", desc: 10, neg: 1, top: 15, dteMin: 365, dteMax: 730 },
     model: { selicAuto: true, selic: 14, alvoAlta: 20, premioMin: 0.03, idadeMax: 4, idadeMaxLong: 10 }
   };
   const clone = o => JSON.parse(JSON.stringify(o));
@@ -264,11 +264,12 @@
   function textoFunilLong(f, n) {
     const ordem = ["calls lidas", "prêmio", "strike", "negócios", "preço atual", "DTE", "IV válida", "desconto HV"];
     const dicas = { "prêmio": "aumente 'Prêmio máx'", "strike": "aumente 'Range +/-' (para LEAPS, 15–25% costuma ser melhor)", "negócios": "reduza 'Neg. mín'",
-      "preço atual": "as calls não negociam há dias (veja 'Idade máx. preço longas')", "DTE": "amplie 'DTE mín/máx' (hoje só há vencimentos longos nos ativos mais líquidos)",
+      "preço atual": "as calls não negociam há dias (veja 'Idade máx. preço longas')", "DTE": "não há calls com negócio nesse prazo; reduza 'DTE mín' (ex.: 180) — LEAPS negociam pouco no opcoes.net.br",
       "IV válida": "prêmios inconsistentes", "desconto HV": "reduza 'Desc HV % mín'" };
     const linhas = ordem.map(k => `${k}: ${f[k] || 0}`);
     const culpado = ordem.find(k => k !== "calls lidas" && !f[k]);
-    return `Nenhuma call passou nos filtros (${n} ativo(s) varridos${f["ativo sem HV"] ? `, ${f["ativo sem HV"]} sem HV` : ""}).\n\nOpções que sobraram após cada filtro:\n${linhas.join("\n")}` +
+    const maior = f.maiorDte ? `\nMaior prazo com negócio nas calls que passaram até aqui: ${f.maiorDte} dias.` : "";
+    return `Nenhuma call passou nos filtros (${n} ativo(s) varridos${f["ativo sem HV"] ? `, ${f["ativo sem HV"]} sem HV` : ""}).\n\nOpções que sobraram após cada filtro:\n${linhas.join("\n")}${maior}` +
       (culpado ? `\n\nO filtro que zerou foi '${culpado}': ${dicas[culpado] || ""}.` : "");
   }
 
@@ -331,9 +332,9 @@
         cur = { put: [], call: [], long: top }; sel = null;
         const semHv = LG ? list.filter(t => LG[t] && !Number.isFinite(LG[t].hv)).length : 0;
         setStatus(`Varridos <b>${list.length - fail}</b> ativo(s) · <b>${out.length}</b> calls passaram nos filtros · mostrando as ${top.length} melhores` +
-          (semHv ? ` <span class="warn">· ${semHv} ativo(s) sem HV não entram no desconto vs HV</span>` : ""));
+          (semHv ? ` <span class="warn">· ${semHv} ativo(s) sem HV: ranqueados sem o desconto (coluna Desc% = n/d)</span>` : ""));
         const cols = ["#", "Opção", "Ativo", "Strike", "Prêmio", "Desc%", "IV%", "PoP%", `ROI(+${P.model.alvoAlta}%)`, "Score", "Sinal", "Venc", "DTE", "IV/HV"];
-        const rows = top.map((o, k) => [k + 1, esc(o.ticker), esc(o.ativo), F2.format(o.strike), F2.format(o.preco), F1.format(o.desc * 100), F1.format(o.iv * 100),
+        const rows = top.map((o, k) => [k + 1, esc(o.ticker), esc(o.ativo), F2.format(o.strike), F2.format(o.preco), Number.isFinite(o.desc) ? F1.format(o.desc * 100) : "n/d", F1.format(o.iv * 100),
           F1.format(o.pop * 100), F2.format(o.roi), F1.format(o.score), o.sinal || "—", ddmmyy(o.venc), o.dias, fx(o.ivHv)]);
         tb.innerHTML = `<div class="op-card"><h3><span>Melhores calls longas</span></h3>${top.length ? table(cols, rows, "long", 9) :
           `<div class="empty-msg">${esc(textoFunilLong(fn, list.length - fail))}</div>`}</div>

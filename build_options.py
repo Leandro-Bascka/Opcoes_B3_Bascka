@@ -458,6 +458,7 @@ def main() -> int:
     ap.add_argument("--max-min", type=float, default=14.0, help="tempo máximo da coleta de opções, em minutos")
     ap.add_argument("--top", type=int, default=0, help="entre os candidatos de opcoes_ativos.txt, mantém só os N mais líquidos EM OPÇÕES (volume negociado no opcoes.net.br); 0 = todos")
     ap.add_argument("--wheel-dte", type=int, default=45, help="na triagem de liquidez (--top) olha só vencimentos até N dias; as LEAPS dos N escolhidos são baixadas depois")
+    ap.add_argument("--leaps-min", type=int, default=180, help="na etapa das calls longas, baixa só vencimentos com mais de N dias (padrão 180; poupa tempo)")
     ap.add_argument("--hist-url", default="", help="opcional: endereço de outro site (GitHub Pages) com candles já publicados; não é usado por padrão")
     ap.add_argument("--hv-yahoo", action="store_true", help="opcional: baixa histórico no Yahoo para HV/candles (padrão: desligado)")
     ap.add_argument("--diag", default="", help="só diagnóstico: mostra as linhas cruas da API para o ativo (ex.: --diag PETR4)")
@@ -585,7 +586,7 @@ def main() -> int:
                     del rows_por[a]
             # 2ª etapa: vencimentos longos (LEAPS) só dos escolhidos
             falhou = [x for x in falhou if x[0] in rows_por]
-            falhou += coletar([(a, v) for a in ativos for v in venc_por[a] if dias(v) > args.wheel_dte])
+            falhou += coletar([(a, v) for a in ativos for v in venc_por[a] if dias(v) >= max(args.leaps_min, args.wheel_dte + 1)])
         else:
             falhou = coletar([(a, v) for a in ativos for v in venc_por[a]])
         hists = carregar_hist(ativos)
