@@ -88,6 +88,7 @@ class Net:
         self.sess.mount("https://", ad)
         self.sess.mount("http://", ad)
         self.erro = ""
+        self.deadline = None          # prazo rígido (epoch): depois dele nenhuma requisição é tentada
 
     def _vez(self):
         with self.lock:
@@ -97,8 +98,11 @@ class Net:
         if saida > agora:
             time.sleep(saida - agora)
 
-    def get_json(self, url, tentativas=6):
+    def get_json(self, url, tentativas=3):
         for t in range(tentativas):
+            if self.deadline and time.time() >= self.deadline:
+                self.erro = "tempo máximo da etapa atingido"
+                return None
             self._vez()
             try:
                 with self.sem:
@@ -240,7 +244,7 @@ def historicos_url(base, ativos):
     return out
 
 
-def historicos_yahoo(ativos, max_seg=120):
+def historicos_yahoo(ativos, max_seg=90):
     """OPCIONAL (--hv-yahoo): candles diários via Yahoo, 1 requisição por ativo, para ao primeiro 'Too Many Requests'."""
     try:
         import yfinance as yf
@@ -516,31 +520,33 @@ def main() -> int:
     liquidos = []
     hists = {}
 
-    def coletar(pares):
-        """Baixa (ativo, vencimento) em paralelo. Devolve os pares que falharam."""
+    def coletar(pares, ate):
+        """Baixa (ativo, vencimento) em paralelo até o instante 'ate'. Devolve os pares que falharam/ficaram pendentes."""
         falhou = []
         if not pares:
             return falhou
+        net.deadline = ate
         t1, passo = time.time(), max(1, len(pares) // 5)
-        with ThreadPoolExecutor(max_workers=args.workers) as ex:
-            futs = {ex.submit(baixar_venc, net, a, v): (a, v) for a, v in pares}
-            try:
-                for k, f in enumerate(as_completed(futs, timeout=max(30.0, prazo - time.time())), 1):
-                    a, v = futs[f]
-                    r = f.result()
-                    if r is None:
-                        falhou.append((a, v))
-                    else:
-                        rows_por[a].extend(r)
-                    if k % passo == 0 or k == len(pares):
-                        print(f"    {k}/{len(pares)} vencimentos ({time.time() - t1:.0f}s)", flush=True)
-            except TimeoutError:
-                pend = [av for f, av in futs.items() if not f.done()]
-                print(f"  [aviso] tempo máximo atingido; {len(pend)} vencimento(s) ficaram sem baixar.", flush=True)
-                for f in futs:
-                    f.cancel()
-                for a_, v_ in pend:
-                    erro_ativo.setdefault(a_, "tempo esgotado em alguns vencimentos")
+        ex = ThreadPoolExecutor(max_workers=args.workers)
+        futs = {ex.submit(baixar_venc, net, a, v): (a, v) for a, v in pares}
+        try:
+            for k, f in enumerate(as_completed(futs, timeout=max(5.0, ate - time.time() + 20)), 1):
+                a, v = futs[f]
+                r = f.result()
+                if r is None:
+                    falhou.append((a, v))
+                else:
+                    rows_por[a].extend(r)
+                if k % passo == 0 or k == len(pares):
+                    print(f"    {k}/{len(pares)} vencimentos ({time.time() - t1:.0f}s)", flush=True)
+        except TimeoutError:
+            pass
+        pend = [av for f, av in futs.items() if not f.done()]
+        if pend:
+            print(f"  [aviso] tempo da etapa esgotado; {len(pend)} vencimento(s) ficaram sem baixar.", flush=True)
+            for a_, v_ in pend:
+                erro_ativo.setdefault(a_, "tempo esgotado em alguns vencimentos")
+        ex.shutdown(wait=False, cancel_futures=True)
         return falhou
 
     def carregar_hist(lista):
@@ -561,39 +567,51 @@ def main() -> int:
             rows_por[a] = demo_opcoes(a, S, hv, hoje)
     else:
         t1 = time.time()
-        with ThreadPoolExecutor(max_workers=args.workers) as ex:
-            f_venc = {a: ex.submit(vencimentos, net, a) for a in ativos}
-            venc_por = {}
-            for a in ativos:
+        meio = t0 + (prazo - t0) * 0.45                       # triagem de liquidez: no máximo 45% do tempo total
+        net.deadline = meio if args.top else prazo
+        ex = ThreadPoolExecutor(max_workers=args.workers)
+        f_venc = {a: ex.submit(vencimentos, net, a) for a in ativos}
+        venc_por = {}
+        for a in ativos:
+            try:
                 venc_por[a] = vencimentos_validos(f_venc[a].result(), hoje, DTE_MAX)
-                if not venc_por[a]:
-                    erro_ativo[a] = net.erro or "nenhum vencimento retornado"
+            except Exception:  # noqa: BLE001
+                venc_por[a] = []
+            if not venc_por[a]:
+                erro_ativo[a] = net.erro or "nenhum vencimento retornado"
+        ex.shutdown(wait=False, cancel_futures=True)
         dias = lambda v: (pd.to_datetime(v).normalize() - hoje).days
         print(f"  vencimentos listados em {time.time() - t1:.0f}s", flush=True)
         if args.top:
-            # 1ª etapa: triagem de liquidez só com os vencimentos curtos (rápido)
-            print(f"  triagem de liquidez: {len(ativos)} candidatos, vencimentos até {args.wheel_dte} dias...", flush=True)
-            falhou = coletar([(a, v) for a in ativos for v in venc_por[a] if dias(v) <= args.wheel_dte])
+            # 1ª etapa: triagem de liquidez só com os 2 vencimentos curtos mais próximos de cada candidato (rápido)
+            curtos = [(a, v) for a in ativos for v in [x for x in venc_por[a] if dias(x) <= args.wheel_dte][:2]]
+            print(f"  triagem de liquidez: {len(ativos)} candidatos, {len(curtos)} vencimentos...", flush=True)
+            falhou = coletar(curtos, meio)
             volume = {a: sum(r[7] for r in rows_por[a]) for a in ativos}
             liquidos = sorted([a for a in ativos if rows_por[a]], key=lambda a: -volume[a])
             sem_dados = [a for a in ativos if not rows_por[a]]
             if sem_dados:
-                print(f"  [info] {len(sem_dados)} candidato(s) sem opções negociadas ou sem opções listadas (ignorados): {', '.join(sem_dados)}", flush=True)
+                print(f"  [info] {len(sem_dados)} candidato(s) sem opções negociadas ou sem dados (ignorados): {', '.join(sem_dados)}", flush=True)
             ativos = liquidos[:args.top]
             print(f"  mantidos os {len(ativos)} mais líquidos em opções: {', '.join(ativos)}", flush=True)
             for a in list(rows_por):
                 if a not in ativos:
                     del rows_por[a]
-            # 2ª etapa: vencimentos longos (LEAPS) só dos escolhidos
+            # 2ª etapa: vencimentos longos (LEAPS) só dos escolhidos, na ordem de liquidez; no máx. 6 por ativo (os mais longos)
             falhou = [x for x in falhou if x[0] in rows_por]
-            falhou += coletar([(a, v) for a in ativos for v in venc_por[a] if dias(v) >= max(args.leaps_min, args.wheel_dte + 1)])
+            lim = max(args.leaps_min, args.wheel_dte + 1)
+            longos = [(a, v) for a in ativos for v in [x for x in venc_por[a] if dias(x) >= lim][-6:]]
+            print(f"  calls longas: {len(longos)} vencimentos...", flush=True)
+            falhou += coletar(longos, prazo)
         else:
-            falhou = coletar([(a, v) for a in ativos for v in venc_por[a]])
+            falhou = coletar([(a, v) for a in ativos for v in venc_por[a]], prazo)
+        net.deadline = None
         hists = carregar_hist(ativos)
         if falhou and time.time() < prazo:                   # nova passada, mais devagar, só dos que falharam
             print(f"  refazendo {len(falhou)} vencimento(s) que falharam, em ritmo mais lento...", flush=True)
             net.intervalo = max(net.intervalo, 0.3)
             net.pausa_ate = 0.0
+            net.deadline = prazo + 120
             with ThreadPoolExecutor(max_workers=3) as ex:
                 for (a, v), r in zip(falhou, ex.map(lambda av: baixar_venc(net, av[0], av[1]), falhou)):
                     if r is None:
