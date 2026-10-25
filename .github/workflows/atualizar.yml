@@ -40,8 +40,8 @@ jobs:
           PYTHONUNBUFFERED: "1"
         run: >
           python -u build_options.py --out site
-          --workers 5
-          --intervalo 0.3
+          --workers 8
+          --intervalo 0.2
           --max-min 20
           --top 30
           --wheel-dte 45
