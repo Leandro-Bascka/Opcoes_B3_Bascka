@@ -14,7 +14,7 @@ permissions:
 
 concurrency:
   group: opcoes-b3-pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -42,7 +42,7 @@ jobs:
           python -u build_options.py --out site
           --workers 5
           --intervalo 0.3
-          --max-min 22
+          --max-min 20
           --top 30
           --wheel-dte 45
           --hv-yahoo
