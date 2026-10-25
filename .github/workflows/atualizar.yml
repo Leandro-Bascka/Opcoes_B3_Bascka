@@ -19,7 +19,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -40,9 +40,9 @@ jobs:
           PYTHONUNBUFFERED: "1"
         run: >
           python -u build_options.py --out site
-          --workers 3
-          --intervalo 0.6
-          --max-min 18
+          --workers 5
+          --intervalo 0.3
+          --max-min 22
           --top 30
           --wheel-dte 45
           --hv-yahoo
