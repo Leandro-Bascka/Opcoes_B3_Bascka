@@ -21,6 +21,7 @@ import sys
 import threading
 import time
 import zlib
+import subprocess
 from io import StringIO
 from concurrent.futures import ThreadPoolExecutor, TimeoutError, as_completed
 from datetime import datetime, timedelta, timezone
@@ -432,7 +433,7 @@ def demo_opcoes(ativo, S, hv, hoje):
 FUNDAMENTUS_URL = "https://www.fundamentus.com.br/resultado.php"
 
 
-def _tickers_fundamentus(html, n):
+def _tickers_fundamentus(html, n, com_liq=False):
     """Tabela do Fundamentus -> tickers ordenados por liquidez média de 2 meses (Liq.2meses), maiores primeiro."""
     df = pd.read_html(StringIO(html), decimal=",", thousands=".")[0][["Papel", "Liq.2meses"]].copy()
     liq = df["Liq.2meses"]
@@ -442,6 +443,8 @@ def _tickers_fundamentus(html, n):
     df["Papel"] = df["Papel"].astype(str).str.strip().str.upper()
     df = df[df["Papel"].str.fullmatch(r"[A-Z]{4}(3|4|5|6|11)") & (df["liq"] > 0)]    # só ações/units com opções possíveis
     df = df.sort_values("liq", ascending=False).drop_duplicates("Papel")
+    if com_liq:
+        return [(a, float(b)) for a, b in zip(df["Papel"].head(n), df["liq"].head(n))]
     return df["Papel"].head(n).tolist()
 
 
@@ -461,11 +464,12 @@ def universo_fundamentus(n, cdir="cache", max_h=24.0):
     try:
         r = requests.get(FUNDAMENTUS_URL, headers=HEADERS, timeout=30)
         r.raise_for_status()
-        lst = _tickers_fundamentus(r.text, max(n, 250))
+        rk = _tickers_fundamentus(r.text, max(n, 250), com_liq=True)
+        lst = [a for a, _ in rk]
         if len(lst) < 30:
             raise ValueError(f"tabela com poucos tickers ({len(lst)})")
         os.makedirs(cdir, exist_ok=True)
-        dump(p, {"tickers": lst, "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds")})
+        dump(p, {"tickers": lst, "liq": {a: b for a, b in rk}, "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds")})
         print(f"  universo: {min(n, len(lst))} tickers mais líquidos do Fundamentus", flush=True)
         return lst[:n]
     except Exception as e:  # noqa: BLE001
@@ -475,6 +479,65 @@ def universo_fundamentus(n, cdir="cache", max_h=24.0):
                 return json.load(f)["tickers"][:n]
         except Exception:
             return []
+
+
+def escrever_universo(path, tickers, cdir="cache", tam_lote=10):
+    """Grava a lista final (ordem de liquidez) com o lote de cada ativo. Serve de conferência e fica publicada no site."""
+    liq = {}
+    try:
+        with open(os.path.join(cdir, "_universo.json"), encoding="utf-8") as f:
+            liq = json.load(f).get("liq", {})
+    except Exception:
+        pass
+    itens = [{"pos": i + 1, "t": t, "lote": i // tam_lote + 1, "liq_2meses": liq.get(t)} for i, t in enumerate(tickers)]
+    try:
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+        dump(path, {"gerado_em": datetime.now(timezone.utc).isoformat(timespec="seconds"), "fonte": "Fundamentus (Liq.2meses)",
+                    "tamanho_lote": tam_lote, "n": len(itens), "ativos": itens})
+    except Exception as e:  # noqa: BLE001
+        print(f"  [aviso] não gravei {path}: {e}", flush=True)
+    return itens
+
+
+def obter_universo(args):
+    """As N ações mais líquidas (Fundamentus; cache 24h). Plano B: opcoes_ativos.txt."""
+    lst = universo_fundamentus(args.n_universo, args.hist_cache)
+    if not lst:
+        lst = ler_ativos(args.ativos)[:args.n_universo]
+        print(f"  [aviso] usando opcoes_ativos.txt como universo ({len(lst)} ativos)", flush=True)
+    return lst
+
+
+def rodar_lotes(args):
+    """--lote 0: roda os lotes (de --lote-tam ativos) um por vez, cada um em um processo próprio e com tempo limite.
+    Um lote que falhar ou estourar o tempo não derruba os outros; os dados dos lotes anteriores ficam preservados."""
+    universo = obter_universo(args)
+    escrever_universo(os.path.join(args.out, "data", "opcoes", "universo_80.json"), universo, args.hist_cache, args.lote_tam)
+    n = -(-len(universo) // args.lote_tam)
+    base, skip, i = [], False, 1
+    for a in sys.argv[1:]:
+        if skip:
+            skip = False
+            continue
+        if a == "--lote":
+            skip = True
+            continue
+        if a.startswith("--lote="):
+            continue
+        base.append(a)
+    print(f"Universo: {len(universo)} ações em {n} lote(s) de {args.lote_tam}", flush=True)
+    t0 = time.time()
+    for i in range(1, n + 1):
+        print(f"\n=== LOTE {i}/{n}: {', '.join(universo[(i - 1) * args.lote_tam:i * args.lote_tam])} ===", flush=True)
+        try:
+            subprocess.run([sys.executable, "-u", os.path.abspath(__file__)] + base + ["--lote", str(i)],
+                           timeout=(args.max_min + 4) * 60)
+        except subprocess.TimeoutExpired:
+            print(f"[aviso] lote {i} passou do tempo e foi interrompido; os demais seguem.", flush=True)
+        except Exception as e:  # noqa: BLE001
+            print(f"[aviso] lote {i} falhou: {e}", flush=True)
+    print(f"\nTodos os lotes terminaram em {time.time() - t0:.0f}s.", flush=True)
+    return 0
 
 
 def ler_ativos(path):
@@ -515,12 +578,11 @@ def restaurar_tudo(prev_url, out, lista):
         return [], []
     tem = {x["t"] for x in lista}
     novos = []
-    for x in m.get("ativos", []):
-        if x["t"] in tem:
-            continue
-        ja = recuperar_anterior(prev_url, x["t"], out)
-        if ja:
-            novos.append({"t": x["t"], "n": len(ja["rows"]), "fetched_at": ja.get("fetched_at"), "stale": True})
+    alvo = [x for x in m.get("ativos", []) if x["t"] not in tem]
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        for x, ja in zip(alvo, ex.map(lambda x: recuperar_anterior(prev_url, x["t"], out), alvo)):
+            if ja:
+                novos.append({"t": x["t"], "n": len(ja["rows"]), "fetched_at": ja.get("fetched_at"), "stale": True})
     print(f"  restaurados {len(novos)} ativo(s) da última coleta boa publicada", flush=True)
     return novos, m.get("liquidos", [])
 
@@ -604,22 +666,43 @@ def main() -> int:
     ap.add_argument("--hist-cache-h", type=float, default=20.0, help="idade máxima (h) do cache de histórico antes de consultar o Yahoo de novo")
     ap.add_argument("--hist-url", default="", help="opcional: endereço de outro site (GitHub Pages) com candles já publicados; não é usado por padrão")
     ap.add_argument("--hv-yahoo", action="store_true", help="opcional: baixa histórico no Yahoo para HV/candles (padrão: desligado)")
+    ap.add_argument("--lote", type=int, default=None, help="coleta por lotes: N = só o lote N; 0 = roda todos os lotes em sequência")
+    ap.add_argument("--lote-tam", type=int, default=10, help="ativos por lote (padrão 10)")
+    ap.add_argument("--n-universo", type=int, default=80, help="quantas ações mais líquidas (Fundamentus) formam o universo dos lotes")
+    ap.add_argument("--gerar-universo", action="store_true", help="só gera/mostra a lista das N ações mais líquidas (universo_80.json) e sai")
     ap.add_argument("--diag", default="", help="só diagnóstico: mostra as linhas cruas da API para o ativo (ex.: --diag PETR4)")
     ap.add_argument("--only", default="", help="só estes ativos, separados por vírgula (ex.: PETR4,VALE3)")
     args = ap.parse_args()
 
     if args.diag:
         return diagnostico(args.diag.strip().upper())
+    if args.gerar_universo:
+        uni = obter_universo(args)
+        itens = escrever_universo("universo_80.json", uni, args.hist_cache, args.lote_tam)
+        for it in itens:
+            print(f"  {it['pos']:>3}. {it['t']:<7} lote {it['lote']}  liq 2m: {it['liq_2meses'] if it['liq_2meses'] is not None else 'n/d'}")
+        print(f"universo_80.json gravado ({len(itens)} ações).")
+        return 0
+    if args.lote == 0:
+        return rodar_lotes(args)
     out = os.path.join(args.out, "data", "opcoes")
     os.makedirs(out, exist_ok=True)
     t0 = time.time()
     prazo = t0 + args.max_min * 60
     agora = datetime.now(timezone.utc)
     hoje = pd.Timestamp((agora - timedelta(hours=3)).date())
-    ativos = []
-    if args.universo == "fundamentus" and not args.demo:
+    ativos, universo = [], []
+    if args.lote is not None and not args.demo:
+        universo = obter_universo(args)
+        ativos = universo[(args.lote - 1) * args.lote_tam:args.lote * args.lote_tam]
+        args.top = 0                                        # universo já é o das mais líquidas: sem triagem
+        if not ativos:
+            print(f"Lote {args.lote}: vazio (universo tem {len(universo)} ações).")
+            return 0
+        print(f"Lote {args.lote}: {', '.join(ativos)}", flush=True)
+    elif args.universo == "fundamentus" and not args.demo:
         ativos = universo_fundamentus(args.cand, args.hist_cache)
-    if not ativos:
+    if not ativos and args.lote is None:
         ativos = ler_ativos(args.ativos)                    # plano B / modo arquivo / demo
     if args.only:
         pedidos = [t.strip().upper() for t in args.only.split(",") if t.strip()]
@@ -632,6 +715,10 @@ def main() -> int:
         selic = SELIC_PADRAO
     print(f"Selic: {selic * 100:.2f}% ({fonte_selic}{' ' + selic_data if selic_data else ''})")
 
+    if args.lote is not None and not args.demo and args.prev_url and not os.path.exists(os.path.join(out, "meta.json")):
+        novos_, liq_ = restaurar_tudo(args.prev_url, out, [])
+        if novos_:
+            dump(os.path.join(out, "meta.json"), {"ativos": novos_, "falhas": [], "liquidos": liq_, "sem_hv": []})
     net = Net(args.workers, args.intervalo)
     lista, falhas, motivos = [], [], {}
     total = len(ativos)
@@ -793,7 +880,23 @@ def main() -> int:
                   f"{reaproveitados} reaproveitados (<{args.leaps_ttl_h:g}h)...", flush=True)
             falhou += coletar(put_venc + longos, prazo)
         else:
-            falhou = coletar([(a, v) for a in ativos for v in venc_por[a]], prazo)
+            pares, reaproveitados = [], 0
+            for a in ativos:
+                lv = [v for v in venc_por[a] if dias(v) >= args.leaps_min]
+                pr = prev_leaps(a) if (lv and args.leaps_ttl_h > 0) else None
+                prev = pr[0] if pr else None
+                if pr:
+                    leaps_at_por[a] = pr[1]
+                pares += [(a, v) for v in venc_por[a] if 1 <= dias(v) <= args.put_dte]
+                for v in lv:
+                    if prev is not None and v in prev:
+                        rows_por[a].extend(prev[v])
+                        reaproveitados += 1
+                    else:
+                        pares.append((a, v))
+            print(f"  PUT ≤{args.put_dte}d + LEAPS >{args.leaps_min}d: {len(pares)} vencimentos a baixar, "
+                  f"{reaproveitados} LEAPS reaproveitados (<{args.leaps_ttl_h:g}h)", flush=True)
+            falhou = coletar(pares, prazo)
         net.deadline = None
         hists = carregar_hist(ativos)
         if falhou and time.time() < prazo:                   # nova passada, mais devagar, só dos que falharam
@@ -829,8 +932,26 @@ def main() -> int:
     if net.n429:
         print(f"[info] o site limitou {net.n429}x (HTTP 429); a coleta desacelerou sozinha.")
 
+    sem_hv_prev = []
+    if args.lote is not None and not args.demo:
+        try:
+            with open(os.path.join(out, "meta.json"), encoding="utf-8") as f:
+                antigo = json.load(f)
+        except Exception:
+            antigo = {}
+        uset, nesta, tem = set(universo), set(ativos), {x["t"] for x in lista}
+        for x in antigo.get("ativos", []):
+            if x["t"] not in nesta and x["t"] not in tem and x["t"] in uset:
+                lista.append(x)
+                tem.add(x["t"])
+        for t in antigo.get("falhas", []):
+            if t not in nesta and t in uset and t not in tem and t not in falhas:
+                falhas.append(t)
+                motivos[t] = (antigo.get("falhas_motivo") or {}).get(t, "")
+        sem_hv_prev = [t for t in antigo.get("sem_hv", []) if t not in nesta and t in uset]
+        liquidos = [t for t in universo if t in tem]
     n_frescos = sum(1 for x in lista if not x.get("stale"))
-    if args.prev_url and not args.demo and n_frescos < 5:
+    if args.prev_url and not args.demo and args.lote is None and n_frescos < 5:
         print(f"[aviso] a coleta trouxe só {n_frescos} ativo(s) novo(s); mantendo também os dados da última coleta boa.", flush=True)
         novos, liq_prev = restaurar_tudo(args.prev_url, out, lista)
         lista += novos
@@ -844,7 +965,7 @@ def main() -> int:
         "updated_at": agora.isoformat(timespec="seconds"),
         "updated_brt": (agora - timedelta(hours=3)).strftime("%d/%m/%Y %H:%M"),
         "selic": selic, "selic_fonte": fonte_selic, "selic_data": selic_data,
-        "demo": bool(args.demo), "ativos": lista, "falhas": falhas, "falhas_motivo": motivos, "liquidos": liquidos or [x["t"] for x in lista], "sem_hv": [a for a in ativos if hists.get(a) is None], "seconds": round(time.time() - t0, 1),
+        "demo": bool(args.demo), "ativos": lista, "falhas": falhas, "falhas_motivo": motivos, "liquidos": liquidos or [x["t"] for x in lista], "sem_hv": [a for a in ativos if hists.get(a) is None] + sem_hv_prev, "seconds": round(time.time() - t0, 1),
         "erro": "" if lista else (net.erro or "nenhum ativo coletado"),
     }
     dump(os.path.join(out, "meta.json"), meta)

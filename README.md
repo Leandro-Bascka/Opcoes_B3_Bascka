@@ -24,3 +24,9 @@ O log mostra o diagnóstico da API no início e o tempo de cada fase da coleta.
 
 ## Limitações
 Sem interesse aberto (OI) na fonte: os sinais 🐋 🟣 🧲 ficam inativos. Preços de opções ilíquidas podem estar velhos. Ferramenta educacional, não é recomendação de investimento.
+
+
+## Coleta por lotes (v2)
+- `python build_options.py --gerar-universo` gera/mostra `universo_80.json`: as 80 ações mais líquidas (Fundamentus, Liq.2meses) e o lote de cada uma.
+- `python build_options.py --out site --lote 0 --lote-tam 10 --max-min 4 --put-dte 60 --leaps-min 90 --hv-yahoo` roda os 8 lotes em sequência, cada um em processo próprio e com tempo limite; um lote que falhar não derruba os outros e os dados dos lotes anteriores são preservados. `--lote 3` roda só o lote 3.
+- Cada lote atualiza `meta.json` e `longas.json` ao terminar (o site já pode ser publicado a qualquer momento).
