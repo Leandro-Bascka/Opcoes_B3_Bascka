@@ -49,6 +49,8 @@ jobs:
           --workers 8
           --intervalo 0.2
           --max-min 20
+          --universo fundamentus
+          --cand 120
           --top 80
           --wheel-dte 45
           --put-dte 60
