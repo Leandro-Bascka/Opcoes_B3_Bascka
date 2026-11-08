@@ -311,6 +311,7 @@
         const todos = P.long.todos, list = todos ? META.ativos.map(a => a.t) : [P.long.ativo];
         const out = []; let done = 0, fail = 0; const fn = {};
         const LG = await loadLong(); if (my !== runId) return;
+        if (LG && !Object.keys(LG).length) { tb.innerHTML = `<div class="op-card"><h3>Sem calls longas na coleta</h3><div class="empty-msg">A última coleta não trouxe nenhuma CALL negociada com vencimento acima do DTE mínimo configurado na coleta (--leaps-min). Os filtros desta tela não são o problema: veja o log da coleta (linha “CALLs negociadas coletadas por prazo”) e reduza --leaps-min.</div></div>`; return; }
         const prog = () => { tb.innerHTML = `<div class="op-card"><div class="empty-msg">Carregando opções… ${done}/${list.length}</div><div class="prog"><s style="width:${done / list.length * 100}%"></s></div></div>`; };
         prog();
         let i = 0;

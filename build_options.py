@@ -529,6 +529,7 @@ def gerar_longas(out, lista, dmin=60):
     """Um único arquivo com só as CALLs de 60–730 dias de todos os ativos: a tela "Calls longas" baixa
     1 arquivo pequeno em vez de um por ativo (muito mais rápido, principalmente no celular)."""
     assets, n = {}, 0
+    faixas = {"<60d": 0, "60-179d": 0, "180-364d": 0, ">=365d": 0}
     for item in lista:
         try:
             with open(os.path.join(out, f"{item['t']}.json"), encoding="utf-8") as f:
@@ -539,6 +540,7 @@ def gerar_longas(out, lista, dmin=60):
                 if r[2] != "CALL":
                     continue
                 dias = (pd.to_datetime(r[1]) - base).days
+                faixas["<60d" if dias < 60 else "60-179d" if dias < 180 else "180-364d" if dias < 365 else ">=365d"] += 1
                 if dmin <= dias <= 730:
                     rows.append(r)
             if rows:
@@ -546,6 +548,9 @@ def gerar_longas(out, lista, dmin=60):
                 n += len(rows)
         except Exception as e:  # noqa: BLE001
             print(f"   [aviso] longas: {item['t']} ignorado ({e})")
+    print(f"  CALLs negociadas coletadas por prazo: {faixas}  (entram no longas.json: DTE {dmin}-730)", flush=True)
+    if n == 0:
+        print(f"  [aviso] nenhuma CALL negociada com DTE >= {dmin}: baixe --leaps-min (ex.: 90) ou a fonte não tem LEAPS com negócios.", flush=True)
     dump(os.path.join(out, "longas.json"), {"cols": COLS, "assets": assets})
     return n
 
