@@ -1,5 +1,5 @@
 """
-Opcoes_B3 — coleta de dados de OPÇÕES (Wheel / Calls longas). Projeto independente do scanner SMC.
+Opcoes_B3 — coleta de dados de OPÇÕES (Wheel / Calls longas). Projeto 100% independente (não usa o Smc_B3).
 
   - cotações de opções ........ opcoes.net.br  (mesmo endpoint do seu listar_opcoes; requisições simples em paralelo)
   - preço do ativo ............ estimado pelas próprias opções (paridade put-call); nenhum outro site é usado
@@ -88,6 +88,7 @@ class Net:
         self.sess.mount("https://", ad)
         self.sess.mount("http://", ad)
         self.erro = ""
+        self.deadline = None          # prazo rígido (epoch): depois dele nenhuma requisição é tentada
 
     def _vez(self):
         with self.lock:
@@ -97,8 +98,11 @@ class Net:
         if saida > agora:
             time.sleep(saida - agora)
 
-    def get_json(self, url, tentativas=6):
+    def get_json(self, url, tentativas=3):
         for t in range(tentativas):
+            if self.deadline and time.time() >= self.deadline:
+                self.erro = "tempo máximo da etapa atingido"
+                return None
             self._vez()
             try:
                 with self.sem:
@@ -108,12 +112,12 @@ class Net:
                         r = self.sess.get(url, timeout=15, headers=HEADERS)     # com cabeçalhos de navegador
                 if r.status_code == 429:
                     try:
-                        pausa = min(max(float(r.headers.get("Retry-After", "")), 1.0), 90.0)
+                        pausa = min(max(float(r.headers.get("Retry-After", "")), 1.0), 30.0)
                     except Exception:
-                        pausa = min(4.0 * (2 ** t), 60.0)                       # 4s, 8s, 16s, 32s, 60s...
+                        pausa = min(3.0 * (2 ** t), 20.0)                       # 3s, 6s, 12s, 20s
                     self.pausa_ate = max(self.pausa_ate, time.time() + pausa)   # pausa GLOBAL: ninguém insiste junto
                     self.n429 += 1
-                    self.intervalo = min(max(self.intervalo * 1.5, 0.3), 3.0)   # e as próximas ficam mais espaçadas
+                    self.intervalo = min(max(self.intervalo * 1.5, 0.3), 1.0)   # e as próximas ficam mais espaçadas
                     self.erro = "HTTP 429 – o site limitou as requisições"
                     continue
                 if r.status_code != 200:
@@ -240,33 +244,91 @@ def historicos_url(base, ativos):
     return out
 
 
-def historicos_yahoo(ativos, max_seg=120):
-    """OPCIONAL (--hv-yahoo): candles diários via Yahoo, 1 requisição por ativo, para ao primeiro 'Too Many Requests'."""
+def _yahoo_um(a):
+    import yfinance as yf
+    h = yf.Ticker(a + ".SA").history(period="1y", interval="1d", auto_adjust=False, timeout=15)
+    if h is None or len(h) < 30:
+        return None
+    h = h[["Open", "High", "Low", "Close", "Volume"]].dropna()
+    if getattr(h.index, "tz", None) is not None:
+        h.index = h.index.tz_localize(None)
+    return h
+
+
+def _cache_ler(cdir, a, max_h):
+    """Histórico em disco. max_h = idade máxima em horas (None = aceita qualquer idade, só como plano B)."""
+    p = os.path.join(cdir, f"{a}.json")
     try:
-        import yfinance as yf
-    except ImportError:
-        print("  [aviso] yfinance não instalado (pip install yfinance); seguindo sem HV.")
-        return {}
-    out, t0 = {}, time.time()
-    for k, a in enumerate(ativos, 1):
-        if time.time() - t0 > max_seg:
-            print("  [aviso] tempo do Yahoo esgotado; o resto fica sem HV."); break
+        if max_h is not None and time.time() - os.path.getmtime(p) > max_h * 3600:
+            return None
+        with open(p, encoding="utf-8") as f:
+            c = json.load(f)
+        h = pd.DataFrame(c["r"], columns=["Open", "High", "Low", "Close", "Volume"], index=pd.to_datetime(c["d"]))
+        return h if len(h) >= 30 else None
+    except Exception:
+        return None
+
+
+def _cache_gravar(cdir, a, h):
+    try:
+        os.makedirs(cdir, exist_ok=True)
+        dump(os.path.join(cdir, f"{a}.json"), {"d": [d.strftime("%Y-%m-%d") for d in h.index],
+                                               "r": [[float(x) for x in row] for row in h.to_numpy()]})
+    except Exception as e:  # noqa: BLE001
+        print(f"  [aviso] não gravei cache de histórico de {a}: {e}", flush=True)
+
+
+def historicos_yahoo(ativos, cdir="cache", cache_h=20.0, max_seg=90, workers=4):
+    """Histórico diário (HV/candles). Ordem: cache em disco com menos de cache_h horas -> Yahoo em paralelo
+    (só quem não está no cache) -> cache velho como plano B. O HV só muda 1x por dia: normalmente 0 requisições ao Yahoo."""
+    out, faltam = {}, []
+    for a in ativos:
+        h = _cache_ler(cdir, a, cache_h)
+        if h is not None:
+            out[a] = h
+        else:
+            faltam.append(a)
+    print(f"  histórico: {len(out)} do cache ({cache_h:.0f}h), {len(faltam)} a baixar no Yahoo", flush=True)
+    if faltam:
         try:
-            h = yf.Ticker(a + ".SA").history(period="1y", interval="1d", auto_adjust=False, timeout=15)
-            if h is not None and len(h) >= 30:
-                h = h[["Open", "High", "Low", "Close", "Volume"]].dropna()
-                if getattr(h.index, "tz", None) is not None:
-                    h.index = h.index.tz_localize(None)
-                out[a] = h
-        except Exception as e:  # noqa: BLE001
-            if "ratelimit" in f"{type(e).__name__} {e}".lower() or "too many" in str(e).lower():
-                print("  [aviso] Yahoo limitou as requisições; o resto fica sem HV."); break
+            import yfinance  # noqa: F401
+        except ImportError:
+            print("  [aviso] yfinance não instalado (pip install yfinance); seguindo sem HV novo.")
+            faltam_yf = []
+        else:
+            faltam_yf = faltam
+        limitado, t0 = threading.Event(), time.time()
+
+        def um(a):
+            if limitado.is_set() or time.time() - t0 > max_seg:
+                return a, None
+            try:
+                return a, _yahoo_um(a)
+            except Exception as e:  # noqa: BLE001
+                if "ratelimit" in f"{type(e).__name__} {e}".lower() or "too many" in str(e).lower():
+                    limitado.set()
+                return a, None
+
+        if faltam_yf:
+            with ThreadPoolExecutor(max_workers=workers) as ex:
+                for a, h in ex.map(um, faltam_yf):
+                    if h is not None:
+                        out[a] = h
+                        _cache_gravar(cdir, a, h)
+            if limitado.is_set():
+                print("  [aviso] Yahoo limitou as requisições; o resto usa o cache antigo (se houver).", flush=True)
+        for a in faltam:
+            if a not in out:
+                h = _cache_ler(cdir, a, None)
+                if h is not None:
+                    out[a] = h
+                    print(f"  [info] {a}: usando histórico antigo do cache", flush=True)
     return out
 
 
 def estimar_spot(rows, hoje, selic):
     """Preço do ativo estimado só pelas opções (paridade put-call: C - P = S - K·e^(-rT)), usando os pares
-    mais próximos de 'no dinheiro'. Plano C: só é usado se não houver histórico do SMC. None se faltar dado."""
+    mais próximos de 'no dinheiro'. Plano C: só é usado se não houver histórico de preços. None se faltar dado."""
     r = math.log(1 + selic)
     calls, puts = {}, {}
     for t, venc, tipo, k, p, neg, ult, vol in rows:
@@ -394,7 +456,27 @@ def recuperar_anterior(prev_url, ativo, out):
     return None
 
 
-def gerar_longas(out, lista):
+def restaurar_tudo(prev_url, out, lista):
+    """Se a coleta atual quase não trouxe nada, recupera TODOS os ativos da última coleta boa publicada (marcados 'stale')."""
+    try:
+        r = requests.get(prev_url.rstrip("/") + "/data/opcoes/meta.json", timeout=20)
+        m = r.json()
+    except Exception as e:  # noqa: BLE001
+        print(f"  [aviso] sem coleta anterior para restaurar ({type(e).__name__})", flush=True)
+        return [], []
+    tem = {x["t"] for x in lista}
+    novos = []
+    for x in m.get("ativos", []):
+        if x["t"] in tem:
+            continue
+        ja = recuperar_anterior(prev_url, x["t"], out)
+        if ja:
+            novos.append({"t": x["t"], "n": len(ja["rows"]), "fetched_at": ja.get("fetched_at"), "stale": True})
+    print(f"  restaurados {len(novos)} ativo(s) da última coleta boa publicada", flush=True)
+    return novos, m.get("liquidos", [])
+
+
+def gerar_longas(out, lista, dmin=60):
     """Um único arquivo com só as CALLs de 60–730 dias de todos os ativos: a tela "Calls longas" baixa
     1 arquivo pequeno em vez de um por ativo (muito mais rápido, principalmente no celular)."""
     assets, n = {}, 0
@@ -408,7 +490,7 @@ def gerar_longas(out, lista):
                 if r[2] != "CALL":
                     continue
                 dias = (pd.to_datetime(r[1]) - base).days
-                if 60 <= dias <= 730:
+                if dmin <= dias <= 730:
                     rows.append(r)
             if rows:
                 assets[item["t"]] = {"S": a["S"], "hv": a.get("hv"), "fetched_at": a["fetched_at"], "rows": rows}
@@ -456,9 +538,14 @@ def main() -> int:
     ap.add_argument("--workers", type=int, default=6, help="requisições simultâneas ao opcoes.net.br (mais = mais rápido, mais risco de HTTP 429)")
     ap.add_argument("--intervalo", type=float, default=0.25, help="segundos de espera entre requisições (0 = sem espera; sobe sozinho se o site limitar)")
     ap.add_argument("--max-min", type=float, default=14.0, help="tempo máximo da coleta de opções, em minutos")
-    ap.add_argument("--wheel-top", type=int, default=0, help="além de opcoes_ativos.txt, coleta as N ações mais líquidas do Smc_B3 (só para o Wheel)")
-    ap.add_argument("--wheel-dte", type=int, default=45, help="para esses ativos extras, só vencimentos até N dias (padrão 45)")
-    ap.add_argument("--hist-url", default="", help="endereço do site Smc_B3 (GitHub Pages) para reaproveitar candles/HV, sem Yahoo")
+    ap.add_argument("--top", type=int, default=0, help="entre os candidatos de opcoes_ativos.txt, mantém só os N mais líquidos EM OPÇÕES (volume negociado no opcoes.net.br); 0 = todos")
+    ap.add_argument("--wheel-dte", type=int, default=45, help="na triagem de liquidez (--top) olha só vencimentos até N dias; as LEAPS dos N escolhidos são baixadas depois")
+    ap.add_argument("--leaps-min", type=int, default=365, help="LEAPS: baixa só vencimentos com mais de N dias (padrão 365)")
+    ap.add_argument("--put-dte", type=int, default=60, help="PUT/Wheel: baixa todos os vencimentos de 1 a N dias (padrão 60)")
+    ap.add_argument("--leaps-ttl-h", type=float, default=6.0, help="reaproveita os vencimentos LEAPS da coleta anterior se tiverem menos de N horas (0 = sempre baixa)")
+    ap.add_argument("--hist-cache", default="cache", help="pasta do cache de histórico diário (HV)")
+    ap.add_argument("--hist-cache-h", type=float, default=20.0, help="idade máxima (h) do cache de histórico antes de consultar o Yahoo de novo")
+    ap.add_argument("--hist-url", default="", help="opcional: endereço de outro site (GitHub Pages) com candles já publicados; não é usado por padrão")
     ap.add_argument("--hv-yahoo", action="store_true", help="opcional: baixa histórico no Yahoo para HV/candles (padrão: desligado)")
     ap.add_argument("--diag", default="", help="só diagnóstico: mostra as linhas cruas da API para o ativo (ex.: --diag PETR4)")
     ap.add_argument("--only", default="", help="só estes ativos, separados por vírgula (ex.: PETR4,VALE3)")
@@ -476,12 +563,6 @@ def main() -> int:
     if args.only:
         pedidos = [t.strip().upper() for t in args.only.split(",") if t.strip()]
         ativos = [t for t in pedidos if t in ativos] or pedidos
-    dte_lim = {}
-    if args.wheel_top and args.hist_url and not args.demo and not args.only:
-        for t in liquidos_smc(args.hist_url, args.wheel_top):
-            if t not in ativos:
-                ativos.append(t)
-                dte_lim[t] = args.wheel_dte
     print(f"Opções: {len(ativos)} ativos ({'DEMO' if args.demo else 'reais'})")
 
     selic, selic_data = (SELIC_PADRAO, "demo") if args.demo else selic_bcb()
@@ -510,68 +591,162 @@ def main() -> int:
         dump(os.path.join(out, f"{ativo}_px.json"), {"candles": candles})
         dump(os.path.join(out, f"{ativo}.json"), {
             "ativo": ativo, "fetched_at": hoje_str, "S": S, "S_fonte": fonte, "hv20": num(hv20), "hv60": num(hv60),
-            "hv": num(hv), "cols": COLS, "rows": rows})
+            "hv": num(hv), "leaps_at": leaps_at_por.get(ativo, hoje_str), "cols": COLS, "rows": rows})
         return {"t": ativo, "n": len(rows), "fetched_at": hoje_str, "hv": num(hv) is not None}, S, hv
 
     def historico(ativo):
         return demo_frame(ativo, bars=260).tail(252) if args.demo else None
 
     rows_por = {a: [] for a in ativos}
+    leaps_at_por = {}
     erro_ativo = {}
-    hists = {a: historico(a) for a in ativos}
-    if args.hist_url and not args.demo:
-        hists.update(historicos_url(args.hist_url, ativos))
-    if args.hv_yahoo and not args.demo:
-        hists.update(historicos_yahoo([a for a in ativos if hists[a] is None]))
-    sem_hv = [a for a in ativos if hists[a] is None]
-    if sem_hv and not args.demo:
-        print(f"  [info] sem HV/candles (preço pela paridade put-call) em {len(sem_hv)} ativo(s); use --hist-url (site do Smc_B3) ou --hv-yahoo para ter HV.", flush=True)
+    liquidos = []
+    hists = {}
+
+    def coletar(pares, ate):
+        """Baixa (ativo, vencimento) em paralelo até o instante 'ate'. Devolve os pares que falharam/ficaram pendentes."""
+        falhou = []
+        if not pares:
+            return falhou
+        net.deadline = ate
+        t1, passo = time.time(), max(1, len(pares) // 5)
+        ex = ThreadPoolExecutor(max_workers=args.workers)
+        futs = {ex.submit(baixar_venc, net, a, v): (a, v) for a, v in pares}
+        try:
+            for k, f in enumerate(as_completed(futs, timeout=max(5.0, ate - time.time() + 20)), 1):
+                a, v = futs[f]
+                r = f.result()
+                if r is None:
+                    falhou.append((a, v))
+                else:
+                    rows_por[a].extend(r)
+                if k % passo == 0 or k == len(pares):
+                    print(f"    {k}/{len(pares)} vencimentos ({time.time() - t1:.0f}s)", flush=True)
+        except TimeoutError:
+            pass
+        pend = [av for f, av in futs.items() if not f.done()]
+        if pend:
+            print(f"  [aviso] tempo da etapa esgotado; {len(pend)} vencimento(s) ficaram sem baixar.", flush=True)
+            for a_, v_ in pend:
+                erro_ativo.setdefault(a_, "tempo esgotado em alguns vencimentos")
+        ex.shutdown(wait=False, cancel_futures=True)
+        return falhou
+
+    def prev_leaps(ativo):
+        """Linhas LEAPS por vencimento da coleta anterior, se ela for recente (--leaps-ttl-h). None se não houver."""
+        try:
+            p = os.path.join(out, f"{ativo}.json")
+            if os.path.exists(p):
+                with open(p, encoding="utf-8") as f:
+                    a = json.load(f)
+            elif args.prev_url:
+                r = requests.get(args.prev_url.rstrip("/") + f"/data/opcoes/{ativo}.json", timeout=15)
+                if r.status_code != 200:
+                    return None
+                a = r.json()
+            else:
+                return None
+            ref = a.get("leaps_at") or a.get("fetched_at")
+            if (agora - pd.Timestamp(ref).tz_convert("UTC").to_pydatetime()).total_seconds() > args.leaps_ttl_h * 3600:
+                return None
+            lim = args.leaps_min
+            por = {}
+            for r in a["rows"]:
+                if (pd.to_datetime(r[1]).normalize() - pd.Timestamp((pd.Timestamp(a["fetched_at"]) - timedelta(hours=3)).date())).days >= lim:
+                    por.setdefault(r[1], []).append(r)
+            return (por, ref) if por else None
+        except Exception:
+            return None
+
+    def carregar_hist(lista):
+        h = {a: historico(a) for a in lista}
+        if args.hist_url and not args.demo:
+            h.update(historicos_url(args.hist_url, lista))
+        if args.hv_yahoo and not args.demo:
+            h.update(historicos_yahoo([a for a in lista if h[a] is None], args.hist_cache, args.hist_cache_h))
+        sem = [a for a in lista if h[a] is None]
+        if sem and not args.demo:
+            print(f"  [info] sem HV/candles (preço pela paridade put-call) em {len(sem)} ativo(s); use --hv-yahoo para ter HV.", flush=True)
+        return h
 
     if args.demo:
+        hists = carregar_hist(ativos)
         for a in ativos:
             S, _, _, hv = estatisticas(hists[a])
             rows_por[a] = demo_opcoes(a, S, hv, hoje)
     else:
         t1 = time.time()
-        with ThreadPoolExecutor(max_workers=args.workers) as ex:
-            f_venc = {a: ex.submit(vencimentos, net, a) for a in ativos}
-            tarefas = []
+        meio = t0 + (prazo - t0) * 0.35                       # triagem de liquidez: no máximo 35% do tempo total
+        net.deadline = meio if args.top else prazo
+        # Os vencimentos da B3 são os mesmos para (quase) todas as ações: 1 consulta em vez de 1 por ativo.
+        # Vencimento que não existir para um ativo volta vazio (barato).
+        glob = []
+        for ref in ("PETR4", "VALE3", "ITUB4", "BBAS3"):
+            glob = vencimentos_validos(vencimentos(net, ref), hoje, DTE_MAX)
+            if glob:
+                break
+        venc_por = {a: list(glob) for a in ativos}
+        if not glob:
             for a in ativos:
-                vs = vencimentos_validos(f_venc[a].result(), hoje, dte_lim.get(a, DTE_MAX))
-                if not vs:
-                    erro_ativo[a] = net.erro or "nenhum vencimento retornado"
-                tarefas += [(a, v) for v in vs]
-            print(f"  {len(tarefas)} vencimentos em {total} ativos (lista em {time.time() - t1:.0f}s); baixando em paralelo...", flush=True)
-            futs = {ex.submit(baixar_venc, net, a, v): (a, v) for a, v in tarefas}
-            falhou, n_ok, passo = [], 0, max(1, len(tarefas) // 5)
-            try:
-                for k, f in enumerate(as_completed(futs, timeout=max(30.0, prazo - time.time())), 1):
-                    a, v = futs[f]
-                    r = f.result()
-                    if r is None:
-                        falhou.append((a, v))
+                erro_ativo[a] = net.erro or "nenhum vencimento retornado"
+        dias = lambda v: (pd.to_datetime(v).normalize() - hoje).days
+        print(f"  vencimentos listados em {time.time() - t1:.0f}s", flush=True)
+        if args.top:
+            # 1ª etapa: triagem de liquidez só com os 2 vencimentos curtos mais próximos de cada candidato (rápido)
+            def _rep(vs):
+                cand = [x for x in vs if dias(x) <= args.wheel_dte]
+                boa = [x for x in cand if dias(x) >= 10]
+                return (boa or cand)[:1]
+            curtos = [(a, v) for a in ativos for v in _rep(venc_por[a])]
+            print(f"  triagem de liquidez: {len(ativos)} candidatos, {len(curtos)} vencimentos...", flush=True)
+            falhou = coletar(curtos, meio)
+            volume = {a: sum(r[7] for r in rows_por[a]) for a in ativos}
+            liquidos = sorted([a for a in ativos if rows_por[a]], key=lambda a: -volume[a])
+            sem_dados = [a for a in ativos if not rows_por[a]]
+            if sem_dados:
+                print(f"  [info] {len(sem_dados)} candidato(s) sem opções negociadas ou sem dados (ignorados): {', '.join(sem_dados)}", flush=True)
+            ativos = liquidos[:args.top]
+            print(f"  mantidos os {len(ativos)} mais líquidos em opções: {', '.join(ativos)}", flush=True)
+            for a in list(rows_por):
+                if a not in ativos:
+                    del rows_por[a]
+            # 2ª etapa (só dos escolhidos): (a) demais vencimentos de PUT até --put-dte; (b) LEAPS > --leaps-min
+            falhou = [x for x in falhou if x[0] in rows_por]
+            ja = {(a, v) for a in rows_por for v in {r[1] for r in rows_por[a]}} | {(a, v) for a, v in curtos}
+            put_venc = [(a, v) for a in ativos for v in venc_por[a] if 1 <= dias(v) <= args.put_dte and (a, v) not in ja]
+            reaproveitados = 0
+            longos = []
+            for a in ativos:
+                lv = [v for v in venc_por[a] if dias(v) >= args.leaps_min]
+                pr = prev_leaps(a) if (lv and args.leaps_ttl_h > 0) else None
+                prev = pr[0] if pr else None
+                if pr:
+                    leaps_at_por[a] = pr[1]          # mantém a data da coleta original: o prazo (TTL) continua valendo
+                for v in lv:
+                    if prev is not None and v in prev:
+                        rows_por[a].extend(prev[v])
+                        reaproveitados += 1
                     else:
-                        rows_por[a].extend(r)
-                        n_ok += 1
-                    if k % passo == 0 or k == len(tarefas):
-                        print(f"    {k}/{len(tarefas)} vencimentos ({time.time() - t1:.0f}s)", flush=True)
-            except TimeoutError:
-                pend = [av for f, av in futs.items() if not f.done()]
-                print(f"  [aviso] tempo máximo atingido; {len(pend)} vencimento(s) ficaram sem baixar.", flush=True)
-                for f in futs:
-                    f.cancel()
-                for a_, v_ in pend:
-                    erro_ativo.setdefault(a_, "tempo esgotado em alguns vencimentos")
-        if falhou and time.time() < prazo:                   # 2ª passada, mais devagar, só dos que falharam
+                        longos.append((a, v))
+            print(f"  PUT ≤{args.put_dte}d: {len(put_venc)} vencimentos; LEAPS >{args.leaps_min}d: {len(longos)} a baixar, "
+                  f"{reaproveitados} reaproveitados (<{args.leaps_ttl_h:g}h)...", flush=True)
+            falhou += coletar(put_venc + longos, prazo)
+        else:
+            falhou = coletar([(a, v) for a in ativos for v in venc_por[a]], prazo)
+        net.deadline = None
+        hists = carregar_hist(ativos)
+        if falhou and time.time() < prazo:                   # nova passada, mais devagar, só dos que falharam
             print(f"  refazendo {len(falhou)} vencimento(s) que falharam, em ritmo mais lento...", flush=True)
             net.intervalo = max(net.intervalo, 0.3)
             net.pausa_ate = 0.0
+            net.deadline = prazo + 120
             with ThreadPoolExecutor(max_workers=3) as ex:
                 for (a, v), r in zip(falhou, ex.map(lambda av: baixar_venc(net, av[0], av[1]), falhou)):
                     if r is None:
                         erro_ativo.setdefault(a, f"vencimento {v}: {net.erro}")
                     else:
                         rows_por[a].extend(r)
+    total = len(ativos)
 
     for k, ativo in enumerate(ativos, 1):
         try:
@@ -593,14 +768,22 @@ def main() -> int:
     if net.n429:
         print(f"[info] o site limitou {net.n429}x (HTTP 429); a coleta desacelerou sozinha.")
 
-    n_long = gerar_longas(out, lista)
-    print(f"longas.json: {n_long} calls de 60 a 730 dias ({os.path.getsize(os.path.join(out, 'longas.json')) // 1024} KB)")
+    n_frescos = sum(1 for x in lista if not x.get("stale"))
+    if args.prev_url and not args.demo and n_frescos < 5:
+        print(f"[aviso] a coleta trouxe só {n_frescos} ativo(s) novo(s); mantendo também os dados da última coleta boa.", flush=True)
+        novos, liq_prev = restaurar_tudo(args.prev_url, out, lista)
+        lista += novos
+        if not liquidos:
+            liquidos = liq_prev
+        falhas[:] = [t for t in falhas if t not in {x["t"] for x in lista}]
+    n_long = gerar_longas(out, lista, args.leaps_min)
+    print(f"longas.json: {n_long} calls de {args.leaps_min} a 730 dias ({os.path.getsize(os.path.join(out, 'longas.json')) // 1024} KB)")
 
     meta = {
         "updated_at": agora.isoformat(timespec="seconds"),
         "updated_brt": (agora - timedelta(hours=3)).strftime("%d/%m/%Y %H:%M"),
         "selic": selic, "selic_fonte": fonte_selic, "selic_data": selic_data,
-        "demo": bool(args.demo), "ativos": lista, "falhas": falhas, "falhas_motivo": motivos, "sem_hv": [a for a in ativos if hists.get(a) is None], "seconds": round(time.time() - t0, 1),
+        "demo": bool(args.demo), "ativos": lista, "falhas": falhas, "falhas_motivo": motivos, "liquidos": liquidos or [x["t"] for x in lista], "sem_hv": [a for a in ativos if hists.get(a) is None], "seconds": round(time.time() - t0, 1),
         "erro": "" if lista else (net.erro or "nenhum ativo coletado"),
     }
     dump(os.path.join(out, "meta.json"), meta)

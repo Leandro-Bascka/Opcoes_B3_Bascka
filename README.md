@@ -9,10 +9,10 @@ Portado do seu *Scanner Wheel V.2*, sem mudar a lógica (Black-Scholes, IV, delt
 - **Calls longas**: calls de 60–730 dias com desconto vs Black-Scholes pela HV (💎 🚀).
 - Campos editáveis **ficam salvos** no aparelho; **Selic automática** (BCB SGS 432 → última coleta → 14%).
 
-## De onde vêm os dados (nenhuma dependência do SMC)
-- **Opções**: opcoes.net.br, mesmos campos do seu `listar_opcoes` (`i[0]` ticker, `i[2]` tipo, `i[5]` strike, `i[7]` último, `i[8]` negócios, `i[9]` volume, `i[10]` data). Só entram opções com negócios e volume. Requisições em paralelo (12).
-- **Preço do ativo, candles e HV**: reaproveitados do site do **Smc_B3** (`--hist-url`, GitHub Pages; sem Yahoo). Ativos fora do scanner SMC têm o preço estimado pelas opções (paridade put-call) e ficam sem HV/candles. Publique o Smc_B3 antes.
-- **HV**: **desligada por padrão** (não há fonte de histórico além do Yahoo). Sem HV, a coluna IV/HV e as *calls longas* (desconto vs HV) ficam indisponíveis. Para ligar: `python build_options.py --out site --hv-yahoo` (opcional; para sozinho se o Yahoo limitar). No GitHub, acrescente `--hv-yahoo` ao comando do workflow.
+## De onde vêm os dados (100% independente do Smc_B3)
+- **Lista de ativos e liquidez**: `opcoes_ativos.txt` traz os *candidatos* (papéis que têm opções). A cada coleta o sistema mede o volume negociado em **opções** de cada um, no próprio opcoes.net.br, e mantém só os `--top` mais líquidos (30 no workflow). O ranking vai para `meta.json` (`liquidos`) e o combobox aparece na ordem de liquidez. Papel sem opções é ignorado sozinho; para incluir um novo, acrescente uma linha.
+- **Opções**: opcoes.net.br, mesmos campos do seu `listar_opcoes`. Só entram opções com negócios e volume. A triagem usa vencimentos até 45 dias (`--wheel-dte`); as calls longas (LEAPS) são baixadas depois, só dos escolhidos.
+- **Preço, candles e HV**: `--hv-yahoo` baixa o histórico diário só dos escolhidos (1 requisição por ativo; para sozinho se o Yahoo limitar). Sem isso o preço é estimado pelas opções (paridade put-call) e ficam sem HV/candles; a coluna IV/HV e as calls longas dependem da HV. Para desligar o Yahoo, apague `--hv-yahoo` do workflow.
 - **Selic**: BCB.
 
 ## Publicar no GitHub (pelo navegador, sem pastas)
