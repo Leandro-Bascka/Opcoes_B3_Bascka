@@ -19,7 +19,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -41,17 +41,17 @@ jobs:
       - name: Diagnóstico da API (aparece no log)
         continue-on-error: true
         run: python -u build_options.py --diag PETR4
-      - name: Coletar opções
+      - name: Coletar opções (lotes de 10 ações)
         env:
           PYTHONUNBUFFERED: "1"
         run: >
           python -u build_options.py --out site
           --workers 8
           --intervalo 0.2
-          --max-min 20
-          --universo fundamentus
-          --cand 120
-          --top 80
+          --max-min 4
+          --lote 0
+          --lote-tam 10
+          --n-universo 80
           --wheel-dte 45
           --put-dte 60
           --leaps-min 90
