@@ -54,7 +54,7 @@ jobs:
           --top 80
           --wheel-dte 45
           --put-dte 60
-          --leaps-min 365
+          --leaps-min 90
           --hv-yahoo
           --prev-url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}"
       - name: Resumo do resultado por ativo
