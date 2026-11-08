@@ -21,6 +21,7 @@ import sys
 import threading
 import time
 import zlib
+from io import StringIO
 from concurrent.futures import ThreadPoolExecutor, TimeoutError, as_completed
 from datetime import datetime, timedelta, timezone
 
@@ -428,6 +429,54 @@ def demo_opcoes(ativo, S, hv, hoje):
 
 
 # ----------------------------------------------------------------------------
+FUNDAMENTUS_URL = "https://www.fundamentus.com.br/resultado.php"
+
+
+def _tickers_fundamentus(html, n):
+    """Tabela do Fundamentus -> tickers ordenados por liquidez média de 2 meses (Liq.2meses), maiores primeiro."""
+    df = pd.read_html(StringIO(html), decimal=",", thousands=".")[0][["Papel", "Liq.2meses"]].copy()
+    liq = df["Liq.2meses"]
+    if liq.dtype == object:                                   # texto tipo "1.234.567,89" que o pandas não converteu
+        liq = liq.astype(str).str.replace(".", "", regex=False).str.replace(",", ".", regex=False)
+    df["liq"] = pd.to_numeric(liq, errors="coerce")
+    df["Papel"] = df["Papel"].astype(str).str.strip().str.upper()
+    df = df[df["Papel"].str.fullmatch(r"[A-Z]{4}(3|4|5|6|11)") & (df["liq"] > 0)]    # só ações/units com opções possíveis
+    df = df.sort_values("liq", ascending=False).drop_duplicates("Papel")
+    return df["Papel"].head(n).tolist()
+
+
+def universo_fundamentus(n, cdir="cache", max_h=24.0):
+    """Candidatos = as n ações mais líquidas do Fundamentus. Cache de 24h (a liquidez de 2 meses muda devagar).
+    Falhou e não há cache? devolve [] e o chamador usa o opcoes_ativos.txt."""
+    p = os.path.join(cdir, "_universo.json")
+    try:
+        if time.time() - os.path.getmtime(p) < max_h * 3600:
+            with open(p, encoding="utf-8") as f:
+                lst = json.load(f)["tickers"]
+            if len(lst) >= min(n, 30):
+                print(f"  universo: {min(n, len(lst))} tickers do cache (<{max_h:.0f}h)", flush=True)
+                return lst[:n]
+    except Exception:
+        pass
+    try:
+        r = requests.get(FUNDAMENTUS_URL, headers=HEADERS, timeout=30)
+        r.raise_for_status()
+        lst = _tickers_fundamentus(r.text, max(n, 250))
+        if len(lst) < 30:
+            raise ValueError(f"tabela com poucos tickers ({len(lst)})")
+        os.makedirs(cdir, exist_ok=True)
+        dump(p, {"tickers": lst, "fetched_at": datetime.now(timezone.utc).isoformat(timespec="seconds")})
+        print(f"  universo: {min(n, len(lst))} tickers mais líquidos do Fundamentus", flush=True)
+        return lst[:n]
+    except Exception as e:  # noqa: BLE001
+        print(f"  [aviso] Fundamentus indisponível ({type(e).__name__}: {e}); tentando cache antigo / opcoes_ativos.txt", flush=True)
+        try:
+            with open(p, encoding="utf-8") as f:
+                return json.load(f)["tickers"][:n]
+        except Exception:
+            return []
+
+
 def ler_ativos(path):
     with open(path, encoding="utf-8") as f:
         ts = [l.split("#")[0].strip().upper() for l in f]
@@ -533,6 +582,9 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="site")
     ap.add_argument("--ativos", default="opcoes_ativos.txt")
+    ap.add_argument("--universo", default="fundamentus", choices=["fundamentus", "arquivo"],
+                    help="origem dos candidatos: 'fundamentus' = ações mais líquidas (Liq.2meses); 'arquivo' = só opcoes_ativos.txt")
+    ap.add_argument("--cand", type=int, default=120, help="quantos candidatos (mais líquidos no Fundamentus) entram na triagem de opções; o --top escolhe os finais")
     ap.add_argument("--demo", action="store_true")
     ap.add_argument("--prev-url", default="")
     ap.add_argument("--workers", type=int, default=6, help="requisições simultâneas ao opcoes.net.br (mais = mais rápido, mais risco de HTTP 429)")
@@ -559,7 +611,11 @@ def main() -> int:
     prazo = t0 + args.max_min * 60
     agora = datetime.now(timezone.utc)
     hoje = pd.Timestamp((agora - timedelta(hours=3)).date())
-    ativos = ler_ativos(args.ativos)
+    ativos = []
+    if args.universo == "fundamentus" and not args.demo:
+        ativos = universo_fundamentus(args.cand, args.hist_cache)
+    if not ativos:
+        ativos = ler_ativos(args.ativos)                    # plano B / modo arquivo / demo
     if args.only:
         pedidos = [t.strip().upper() for t in args.only.split(",") if t.strip()]
         ativos = [t for t in pedidos if t in ativos] or pedidos
