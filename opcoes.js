@@ -16,13 +16,13 @@
   const COL = { up: "#26c281", dn: "#ef5350", amb: "#f5a524", acc: "#4da3ff", mut: "#8793a4", hv: "#c084fc", venc: "#f472b6" };
 
   // ---------------------------------------------------------------- parâmetros (persistem no aparelho)
-  const PRESETS = { SAFE: [0.10, 0.25], WHEEL: [0.20, 0.32], AGRESSIVO: [0.25, 0.55], RENDA: [0.08, 0.20] };
+  const PRESETS = { SAFE: [0.10, 0.20], WHEEL: [0.15, 0.30], AGRESSIVO: [0.25, 0.45], RENDA: [0.08, 0.20] };
   const DEFAULTS = {
     mode: "wheel",
-    wheel: { ativo: "PETR4", modo: "WHEEL", dteMin: 7, dteMax: 45, negMin: 10, range: "10%", premio: "3%",
-             putMin: 0.20, putMax: 0.32, callMin: 0.20, callMax: 0.32 },
+    wheel: { ativo: "PETR4", modo: "WHEEL", dteMin: 7, dteMax: 60, negMin: 1, range: "15%", premio: "5%",
+             putMin: 0.15, putMax: 0.30, callMin: 0.15, callMax: 0.30 },
     long: { todos: true, ativo: "PETR4", range: "20%", premio: "15%", desc: 10, neg: 1, top: 15, dteMin: 365, dteMax: 730 },
-    model: { selicAuto: true, selic: 14, alvoAlta: 20, premioMin: 0.03, idadeMax: 4, idadeMaxLong: 10 }
+    model: { selicAuto: true, selic: 14, alvoAlta: 20, premioMin: 0.03, idadeMax: 7, idadeMaxLong: 10 }
   };
   const clone = o => JSON.parse(JSON.stringify(o));
   function merge(base, over) {
@@ -34,6 +34,13 @@
     return o;
   }
   let P = merge(DEFAULTS, store.get("p", {}));
+  // Migra apenas os padrões antigos; mantém os parâmetros personalizados.
+  if (P.wheel.dteMax === 45) P.wheel.dteMax = 60;
+  if (P.wheel.negMin === 10) P.wheel.negMin = 1;
+  if (P.wheel.range === "10%") P.wheel.range = "15%";
+  if (P.wheel.premio === "3%") P.wheel.premio = "5%";
+  if (P.wheel.putMin === 0.20 && P.wheel.putMax === 0.32) { P.wheel.putMin = 0.15; P.wheel.putMax = 0.30; }
+  if (P.model.idadeMax === 4) P.model.idadeMax = 7;
   const save = () => store.set("p", P);
 
   // ---------------------------------------------------------------- estado
@@ -42,7 +49,7 @@
   let cur = { put: [], call: [], long: [] }, sel = null;
   // varredura da B3 (aba Wheel)
   const TOPN = 15, TOPP = 8;
-  let RANK = [], view = "scan", SCANA = null, scanning = false, scanDone = 0, showCalls = false;
+  let RANK = [], view = "asset", SCANA = null, scanning = false, scanDone = 0, showCalls = false;
   let ch = null, cs = null, vs = null, e9 = null, vw = null, projS = [], lines = [], chAtivo = null;
 
   async function jget(path, bust) {
@@ -116,7 +123,7 @@
     root.innerHTML = `
       <div class="op">
         <div class="op-top">
-          <div class="seg" id="opTabs"><button data-m="wheel">Wheel · vender PUT/CALL</button><button data-m="long">Calls longas</button></div>
+          <div class="seg" id="opTabs"><button data-m="wheel">Venda de PUT · Wheel</button><button data-m="long">Calls longas</button></div>
           <div class="op-status" id="opStatus">carregando…</div>
         </div>
         <div class="op-ctrl" id="opCtrl"></div>
@@ -362,7 +369,8 @@
     const worker = async () => {
       while (i < list.length) {
         const t = list[i++];
-        try { SCANA[t] = await loadAsset(t); } catch (e) { /* ativo sem arquivo: ignora */ }
+        try { SCANA[t] = await loadAsset(t); }
+        catch (e) { SCANA[t] = { __erro: String(e && e.message || e) }; }
         scanDone++;
         if (scanDone % 5 === 0 || scanDone === list.length) run();
       }
@@ -387,6 +395,7 @@
     const rows = []; let analisados = 0;
     for (const t in SCANA) {
       const A = SCANA[t]; analisados++;
+      if (!A || A.__erro) continue;
       let res;
       try { res = C.scanWheel(A, P.wheel, c, A.hojeMs); }
       catch (e) { tb.innerHTML = `<div class="op-card"><div class="empty-msg">Range e Prêmio máx precisam ser números (R$ ou %, ex.: 2 ou 10%).</div></div>`; return; }
@@ -398,7 +407,9 @@
     rows.sort((a, b) => b.best.score - a.best.score || b.avg - a.avg);
     const top = rows.slice(0, TOPN);
     RANK = top.map(r => ({ t: r.t, score: r.best.score, n: r.n })); fillWheelSelect();
-    setStatus(`Varredura: <b>${analisados}</b> ativos analisados · <b>${rows.length}</b> têm PUTs dentro dos filtros · mostrando os ${top.length} melhores`);
+    const comDados = Object.keys(SCANA).filter(t => SCANA[t] && !SCANA[t].__erro).length;
+    const semDados = Object.keys(SCANA).filter(t => !SCANA[t] || SCANA[t].__erro).length;
+    setStatus(`Varredura concluída: <b>${comDados}</b> ativos com dados · <b>${semDados}</b> sem arquivo · <b>${rows.length}</b> com PUTs aprovadas`);
     const li = top.map((r, k) => {
       const o = r.best;
       return `<button class="scanrow" data-t="${esc(r.t)}"><span class="rk">${k + 1}</span><span class="tk">${esc(r.t)}</span>
@@ -407,7 +418,7 @@
         <span class="n">${r.n} PUT${r.n > 1 ? "s" : ""}</span><span class="scb sc ${sc(o.score)}">${F1.format(o.score)}</span></button>`;
     }).join("");
     tb.innerHTML = `<div class="op-card"><h3><span>Top ${top.length} da B3 — melhores PUTs para vender</span><span class="hint">toque num ativo</span></h3>${top.length ? `<div class="scanlist">${li}</div>`
-      : '<div class="empty-msg">Nenhum ativo tem PUTs dentro dos filtros. Amplie DTE, Δ, Range ou Prêmio máx.</div>'}
+      : '<div class="empty-msg">Nenhum ativo tem PUTs dentro dos filtros. Confira a coleta e amplie DTE, Δ, Range ou Prêmio máx.</div>'}
       <div class="hint" style="margin-top:8px">A nota do ativo é o score da sua melhor PUT. Os filtros acima valem para a varredura.</div></div>`;
   }
 

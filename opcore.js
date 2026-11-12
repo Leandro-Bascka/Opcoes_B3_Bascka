@@ -83,7 +83,9 @@
   function ivBs(price, S, K, T, r, tipo) {
     if (!(price > 0 && S > 0 && K > 0 && T > 0)) return NaN;
     const descK = K * Math.exp(-r * T);
-    const intr = tipo === "CALL" ? Math.max(S - descK, 0) : Math.max(descK - S, 0);
+    // Opções sobre ações brasileiras são tipicamente americanas: use o intrínseco
+    // imediato como piso para não inferir IV de prêmio abaixo do valor exercível.
+    const intr = tipo === "CALL" ? Math.max(S - K, 0) : Math.max(K - S, 0);
     const teto = tipo === "CALL" ? S : descK;
     if (price < intr - 1e-6 || price >= teto) return NaN;
     const f = s => bsPreco(S, K, T, r, s, tipo) - price;
@@ -182,29 +184,32 @@
     const S = A.S, hv = A.hv, r = taxaCont(cfg.selic);
     const faixa = valorOuPct(p.range, S), premioMax = valorOuPct(p.premio, S);
     const etapas = ["prêmio", "strike", "DTE", "negócios", "preço atual", "IV válida", "delta"];
-    const funil = { "lidas na API": A.rows.length };
+    const funil = { "lidas na API": A.rows.length,
+      "prêmio inválido/fora do limite": 0, "strike fora do range": 0,
+      "DTE fora da faixa": 0, "negócios insuficientes": 0, "cotação antiga": 0,
+      "IV inválida/baixa": 0, "delta fora da faixa": 0 };
     etapas.forEach(e => { funil[e] = 0; });
     const puts = [], calls = [];
     for (const o of A.rows) {
       const { strike, preco: premio, tipo } = o;
-      if (premio < cfg.PREMIO_MIN || premio > premioMax) continue;
+      if (!(Number.isFinite(premio) && premio > 0) || premio < cfg.PREMIO_MIN || premio > premioMax) { funil["prêmio inválido/fora do limite"]++; continue; }
       funil["prêmio"]++;
       if ((tipo === "PUT" && (strike > S || strike < S - faixa)) ||
-          (tipo === "CALL" && (strike < S || strike > S + faixa))) continue;
+          (tipo === "CALL" && (strike < S || strike > S + faixa))) { funil["strike fora do range"]++; continue; }
       funil["strike"]++;
       const dias = Math.round((dateMs(o.venc) - hojeMs) / DAY);
-      if (!(dias > 0) || dias < p.dteMin || dias > p.dteMax) continue;
+      if (!(dias > 0) || dias < p.dteMin || dias > p.dteMax) { funil["DTE fora da faixa"]++; continue; }
       funil["DTE"]++;
-      if (o.neg < p.negMin) continue;
+      if (!Number.isFinite(Number(o.neg)) || o.neg < p.negMin) { funil["negócios insuficientes"]++; continue; }
       funil["negócios"]++;
       const idade = idadeDias(o.ult, hojeMs);
-      if (idade != null && idade > cfg.IDADE_MAX_DIAS) continue;
+      if (idade != null && idade > cfg.IDADE_MAX_DIAS) { funil["cotação antiga"]++; continue; }
       funil["preço atual"]++;
       const m = avaliarVenda(tipo, S, strike, premio, dias, r, hv, o.neg, cfg);
-      if (m == null || m.iv < 0.10) continue;
+      if (m == null || m.iv < 0.10 || m.iv > 3.0) { funil["IV inválida/baixa"]++; continue; }
       funil["IV válida"]++;
       const [dmin, dmax] = tipo === "PUT" ? [p.putMin, p.putMax] : [p.callMin, p.callMax];
-      if (Math.abs(m.delta) < dmin || Math.abs(m.delta) > dmax) continue;
+      if (Math.abs(m.delta) < dmin || Math.abs(m.delta) > dmax) { funil["delta fora da faixa"]++; continue; }
       funil["delta"]++;
       (tipo === "PUT" ? puts : calls).push({ ...o, ativo: A.ativo, dias, ...m });
     }
