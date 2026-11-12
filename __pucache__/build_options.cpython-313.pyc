@@ -1,0 +1,657 @@
+ó
+
+    ì5öjR»  ã                   óp  • S r SSKrSSKrSSKrSSKrSSKrSSKrSSKrSSKrSSK	r	SSK
+Jr  SSKJ
+r
+JrJr  SSKJrJrJr  SSKrSSKrSSKrS8S jr/ SQrSrS	rS
+rSSS
+SSS.rS rS r\R@                  RC                  SS5      r" " S S5      r#S r$S r%S r&S r'\4S jr(S r)S r*S r+S r,S  r-S! r.S9S" jr/S# r0S$ r1S% r2S& r3S' r4S( r5S) r6S*r7S:S+ jr8S;S, jr9S<S- jr:S. r;S/ r<S0 r=S1 r>S2 r?S=S3 jr@S4 rAS5\B4S6 jrC\DS7:X  a4  \C" 5       rE\RŒ                  R                  5         \R                  " \E5        gg)>u™  
+Opcoes_B3 â€” coleta de dados de OPÃ‡Ã•ES (Wheel / Calls longas). Projeto 100% independente (nÃ£o usa o Smc_B3).
+
+  - cotaÃ§Ãµes de opÃ§Ãµes ........ opcoes.net.br  (mesmo endpoint do seu listar_opcoes; requisiÃ§Ãµes simples em paralelo)
+  - preÃ§o do ativo ............ estimado pelas prÃ³prias opÃ§Ãµes (paridade put-call); nenhum outro site Ã© usado
+  - HV (volatilidade histÃ³rica)  OPCIONAL: sÃ³ com --hv-yahoo (desligado por padrÃ£o)
+  - Selic ..................... BCB SGS 432
+
+SaÃ­da (site/data/opcoes/): meta.json, longas.json, <ATIVO>.json, <ATIVO>_px.json
+
+Uso:  python build_options.py --out site                 (dados reais)
+      python build_options.py --out site --demo          (dados SIMULADOS)
+      python build_options.py --diag PETR4               (mostra as linhas cruas da API, para conferir os campos)
+      python build_options.py --out site --hv-yahoo      (opcional: HV e candles via Yahoo)
+é    N)ÚStringIO)ÚThreadPoolExecutorÚTimeoutErrorÚas_completed)ÚdatetimeÚ	timedeltaÚtimezonec           
+      óà  • [         R                  R                  [        R                  " U R                  5       5      5      n[        R                  " [        R                  R                  5       R                  5       US9nUR                  SS5      / pTU H¿  nUSUR                  SS5      -   -  owSUR                  SS5      -   -  n[        Xx5      S[        UR                  SS	5      5      -   -  n	[        Xx5      S[        UR                  SS	5      5      -
+  -  n
+UR!                  XyX¨[#        UR%                  S
+S5      5      45        [        US5      nMÁ     [        R&                  " XS/ S
+QS9$ )N)ÚendÚperiodsé   é<   é   r   gü©ñÒMbp?g-Cëâ6:?gü©ñÒMb?gú~j¼t“x?é   gÍÌÌÌÌÌÜ?ç      ð?©ÚOpenÚHighÚLowÚCloseÚVolume)ÚindexÚcolumns)ÚnpÚrandomÚdefault_rngÚzlibÚcrc32ÚencodeÚpdÚbdate_rangeÚ	TimestampÚtodayÚ	normalizeÚuniformÚnormalÚmaxÚabsÚminÚappendÚfloatÚ	lognormalÚ	DataFrame)ÚtickerÚbarsÚrngÚidxÚpriceÚrowsÚ_ÚoÚcÚhÚls              Ú"/tmp/opcoes_patch/build_options.pyÚ
+demo_framer:   !   s%  € Ü
+)‰)×
+Ñ
+¤§
+¢
+¨6¯=©=«?Ó ;Ó
+<€CÜ
+.Š.œRŸ\™\×/Ñ/Ó1×;Ñ;Ó=ÀtÑ
+L€CØ—+‘+˜a Ó$ bˆ4Û
+ˆØQ˜Ÿ™ A uÓ-Ñ-Ñ.ˆ¸¸S¿Z¹ZÈÐPUÓ=VÑ9VÑ4W°Ü‹I˜œS §¡¨A¨uÓ!5Ó6Ñ6Ñ7ˆ¼SÀ»YÈ!ÌcÐRU×R\ÑR\Ð]^Ð`eÓRfÓNgÑJgÑ=h¸Ø‰Q˜1¤ s§}¡}°R¸Ó'>Ó!?Ð@ÔAÌ3ÈqÐRUË;Â5ñ ô <Š<˜Ò1[Ñ\Ð\ó    )r.   ÚvencÚtipoÚstrikeÚprecoÚnegÚultÚvolgìQ¸…ëÁ?éÚ  zNhttps://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/1?formato=jsonzoMozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36z.application/json, text/javascript, */*; q=0.01zpt-BR,pt;q=0.9,en;q=0.8ÚXMLHttpRequestz$https://opcoes.net.br/opcoes/bovespa)z
+User-AgentÚAcceptzAccept-LanguagezX-Requested-WithÚRefererc           	      ó|   • [        U SSS9 n[        R                  " XSSSS9  S S S 5        g ! , (       d  f       g = f)NÚwúutf-8©ÚencodingF)Ú,Ú:)Úensure_asciiÚ
+separatorsÚ	allow_nan)ÚopenÚjsonÚdump)ÚpathÚobjÚfs      r9   rS   rS   ;   s.   € Ü	
+ˆdC 'Ò	*¨aÜ	Š	# u¸ÈuÒU÷ 
++×	*Ö	*ús   Œ-­
+;c                 ó®   •  [        U 5      n [        R                  " U 5      (       d  [        R                  " U 5      (       a  S $ U $ ! [         a     g f = f©N)r+   Ú	ExceptionÚmathÚisnanÚisinf©Úxs    r9   Únumr_   @   sI   € ðÜ!‹Hˆô —J’J˜q—M‘M¤T§Z¢Z°§]¡]ˆ4Ð:¸Ð:øô ó Ùðús   ‚A Á
+AÁAÚ
+OPCOES_APIzhttps://opcoes.net.brc                   ó.   • \ rS rSrSS jrS rSS jrSrg)	ÚNetéO   c                 óª  • X l         X l        SU l        [        R                  " 5       U l        [        R                  " U5      U l        SU l        SU l	        [        R                  " 5       U l        [        R                  R                  XS9nU R                  R                  SU5        U R                  R                  SU5        SU l        S U l        g )Nr   ç        )Úpool_connectionsÚpool_maxsizezhttps://zhttp://Ú )Ú	intervaloÚbaseÚn429Ú	threadingÚLockÚlockÚ	SemaphoreÚsemÚproxÚ	pausa_ateÚrequestsÚSessionÚsessÚadaptersÚHTTPAdapterÚmountÚerroÚdeadline)ÚselfÚworkersri   Úads       r9   Ú__init__ÚNet.__init__P   sœ   € Ø"ŒØŒ	ØˆŒ	Ü—N’NÓ$ˆŒ	Ü×&Ò& wÓ/ˆŒØˆŒ	ØˆŒÜ×$Ò$Ó&ˆŒ	Ü
+×
+Ñ
+×
+*Ñ
+*¸GÐ
+*Ð
+ZˆØ	‰	‰˜
+ BÔ'Ø	‰	‰˜	 2Ô&ØˆŒ	Øˆ
+r;   c                 ó  • U R                      [        R                  " 5       n[        XR                  U R                  5      nX R
+                  -   U l        S S S 5        WW:”  a  [        R                  " X!-
+  5        g g ! , (       d  f       N.= frX   )rn   Útimer'   rq   rr   ri   Úsleep)r{   ÚagoraÚsaidas      r9   Ú_vezÚNet._vez_   s_   € Ø
+Y‹YÜ—I’I“KˆEÜ˜Ÿy™y¨$¯.©.Ó9ˆEØ§¡Ñ.ˆDŒI÷ ð 5‹=ÜJŠJu‘}Õ%ð ÷	 Yús   A	A>Á>
+Bc                 óp  • [        U5       GH  nU R                  (       a,  [        R                  " 5       U R                  :¼  a	  SU l          g U R	                  5          U R
+                     US-  S:X  a  U R                  R                  USS9nOU R                  R                  US[        S9nS S S 5        WR                  S:X  a²   [        [        [        UR                  R                  S	S
+5      5      S5      S5      n[        U R                  [        R                  " 5       U-   5      U l        U =R                   S-
+  sl        [        [        U R"                  S-  S5      S5      U l        SU l        GMl  UR                  S:w  a&  SUR                   SUR$                  S S < 3U l        OU U R"                  U R&                  :”  a(  [        U R&                  U R"                  S-  5      U l        UR)                  5       s  $ [        R0                  " SUS-   -  5        GM     g ! , (       d  f       GN~= f! [         a    [        S
+SU-  -  S5      n GNVf = f! [*         a    SUR$                  S S < 3U l         N{f = f! [         a)  n[-        U5      R.                   SU 3U l         S nAN­S nAff = f)Nu   tempo mÃ¡ximo da etapa atingidoé   r   é
+   ©Útimeoutr   )r‹   Úheadersi­  zRetry-Afterrh   r   g      >@ç      @ç      4@r   g      ø?ç333333Ó?u,   HTTP 429 â€“ o site limitou as requisiÃ§ÃµeséÈ   zHTTP u    â€“ éx   g
+×£p=
+ï?u   resposta nÃ£o Ã© JSON â€“ ú: ç      à?)Úrangerz   r   ry   r…   rp   ru   ÚgetÚHEADERSÚstatus_coder)   r'   r+   rŒ   rY   rr   rk   ri   Útextrj   rR   Ú
+ValueErrorÚtypeÚ__name__r‚   )r{   ÚurlÚ
+tentativasÚtÚrÚpausaÚes          r9   Úget_jsonÚNet.get_jsong   s#  € Üz×"ˆAØ}}¤§¢£°·
+±
+Ó!=Ø=”	ÙØI‰IŒKð
+7Ø—X“XØ˜1‘u “zØ ŸI™IŸM™M¨#°r˜MÐ:™à ŸI™IŸM™M¨#°rÄ7˜MÐK˜÷	 ð
+ —=‘= CÓ'ð:Ü #¤C¬¨a¯i©i¯m©m¸MÈ2Ó.NÓ(OÐQTÓ$UÐW[Ó \˜ô &)¨¯©¼¿º»ÀuÑ9LÓ%MD”NØ—I’I ‘N•IÜ%(¬¨T¯^©^¸cÑ-AÀ3Ó)GÈÓ%MD”NØ ND”IÚØ—=‘= CÓ'Ø"'¨¯
+©
+ °e¸A¿F¹FÀ4ÀC¸LÑ;KÐ LD•IðRØŸ>™>¨D¯I©IÓ5Ü-0°·±¸D¿N¹NÈTÑ<QÓ-R˜DœNØ Ÿv™v›xšô
+ 
+JŠJs˜a !™e‘}×%ñA #ðB ÷7 –Xûô %ó :Ü # C¨1°©6¡N°DÓ 9›ð:ûô &ó RØ&@ÀÇÁÈÈÀÑ@PÐ$Q˜ž	ðRûäó 
+7Ü# A›w×/Ñ/Ð0°°1°#Ð6—	‘	ûð
+7ús{   ÁJÁ*AH%Â.JÃ9H7Ä A5JÅ85JÆ/AIÈ%
+H4	È/JÈ7IÉJÉIÉJÉ"I?É<JÉ>I?É?JÊ
+J5ÊJ0Ê0J5)
+rj   rz   ry   ri   rn   rk   rr   rq   rp   ru   N)é   re   )é   )r›   Ú
+__module__Ú__qualname__Ú__firstlineno__r~   r…   r¢   Ú__static_attributes__© r;   r9   rb   rb   O   s   † ô
+ò&÷"r;   rb   c                 ó¤   • [        U [        5      =(       a:    [        U R                  S5      [        5      =(       a    U R                  SS5      SL$ )NÚdataÚsuccessTF)Ú
+isinstanceÚdictr•   )Úds    r9   Údados_okr±   Œ   s:   € ÜaœÓ×j¤:¨a¯e©e°F«m¼TÓ#B×jÀqÇuÁuÈYÐX\ÓG]ÐejÐGjÐjr;   c                 óø   • S Hn  nU R                  [         SU SU 35      n[        U5      (       d  / s  $ US   R                  S5      =(       d    /  Vs/ s H  oDS   PM	     nnU(       d  Ml  Us  $    / $ s  snf )N)ÚfalseÚtrueú/listaopcoes/completa?idAcao=z!&listarVencimentos=true&cotacoes=r¬   ÚvencimentosÚvalue)r¢   ÚAPI_BASEr±   r•   )ÚnetÚativoÚcotr°   r^   Úvs         r9   r¶   r¶      s   € Û ˆØL‰LœH˜:Ð%BÀ5À'ÐIjÐknÐjoÐpÓqˆÜ˜{‰{ØŠIØ"# F¡)§-¡-°
+Ó">×"DÀ"Ð"DÓFÒ"D˜AˆwŒZÑ"DˆÐFßˆ1ØŠHñ
+ !ð €Iùò 
+Gs   ÁA7c                 ó´  • U R                  [         SU SU 35      n[        U5      (       d  g/ nUS   R                  S5      =(       d    /  GHs  n Sn[	        U5      S:”  a(  [        US   5      (       d  [        US   5      (       a  S	n[
+        US
+   5      R                  5       nUS;  a  Mb  US   b  [        US   5      OSnXV   b
+  [        XV   5      OSn	U	b  U	S
+::  d	  Ub  US
+::  a  M   [	        U5      US-   :”  a!  XVS-      b  [        [        XVS-      5      5      OS
+n
+[	        U5      US
+-   :”  a  XVS
+-      b  [        XVS
+-      5      OSnU
+S
+::  d  US
+::  a  GM  [	        U5      US-   :”  a  XVS-      b  [
+        XVS-      5      SS OSnUR                  [
+        US
+   5      R                  S5      S
+   X'X‰X¬U/5        GMv     U$ ! [         a     GMˆ  f = f)uh   Linhas de um vencimento. None = falhou (serÃ¡ tentado de novo); [] = vencimento sem opÃ§Ãµes negociadas.rµ   ú3&listarVencimentos=false&cotacoes=true&vencimentos=Nr¬   ÚcotacoesOpcoesé   é   r‰   r
+   rˆ   ©ÚCALLÚPUTé   r   r   re   r¥   rh   r4   )
+r¢   r¸   r±   r•   ÚlenÚ_eh_dataÚstrÚupperr+   Úintr*   ÚsplitrY   )
+r¹   rº   r<   r°   r3   ÚiÚbr=   r>   r?   r@   rB   rA   s
+                r9   Úbaixar_vencrÎ   ›   sÙ  € à‰œzÐ!>¸u¸gð F3Ø37°&ð:ó 	;€AäA;‰;ØØ
+€DØ
+ˆv‰Y]‰]Ð+Ó
+,×
+2°Ó
+2ˆð	ð ˆAÜ1‹v˜‹{¤8¨A¨b©E§?¡?´xÀÀ"Á·±ØÜq˜‘t“9—?‘?Ó$ˆDØ˜?Ó*ÙØ$% a¡DÑ$4”U˜1˜Q™4”[¸$ˆFØ#$¡4Ñ#3”E˜!™$”K¸ˆEØ‰} ¨£
+¨f©nÀÈ!ÃÙÜ*-¨a«&°1°q±5«.¸QÀ1¹u¹XÑ=Q”#”e˜A !™e™H“oÔ&ÐWXˆCÜ%(¨£V¨a°!©e£^¸¸a¹%¹Ñ8L”%˜˜a™%™”/ÐRUˆCØa‹x˜3 !›8ÚÜ(+¨A«°°Q±«¸1À¹U¹8Ñ;O”#a˜A™‘h“-  Ñ$ÐUWˆCØK‰Kœ˜Q˜q™T›Ÿ™¨Ó-¨aÑ0°$¸fÈSÐWZÐ[×\ñ' 3ð, €Køô ó 	Ûð	ús'   ÁAGÂ0<GÃ.A-GÅA#GÇ
+GÇGc                 óê   • [        U [        5      =(       a7    [        U 5      S:¬  =(       a"    U S S R                  5       =(       a    SU S S ;   =(       d    [        U [        5      =(       a    SU S S ;   $ )Nr
+   é   Ú-Ú/é   )r®   rÈ   rÆ   Úisdigitr]   s    r9   rÇ   rÇ   »   sa   € ÜaœÓ×R¤# a£&¨A¡+×R°!°B°Q°%·-±-³/×RÀcÈQÈrÐPQÈUÁl×{ÔWaÐbcÔehÓWi×WzÐnqÐuvÐwyÐxyÐuzÑnzÐ{r;   c                 óê   • / nU  HY  n [         R                  " U5      R                  5       U-
+  R                  nSUs=::  a  U::  d  MD  O  MH  UR                  U5        M[     U$ ! [         a     Ml  f = f)Nr   )r    Úto_datetimer$   ÚdaysrY   r*   )ÚlistaÚhojeÚdte_maxÚoutr¼   Údiass         r9   Úvencimentos_validosrÝ   ¿   sp   € Ø
+€CÛ
+ˆð	Ü—N’N 1Ó%×/Ñ/Ó1°DÑ8×>Ñ>ˆDð 
+Õ˜×ÑØJ‰JqŽMñ
+ ð €Jøô	 ó 	Úð	ús   ‰1A$Á$
+A2Á1A2c                 ó  • [         R                  " X R                  S5      -  5      R                  5       n[	        U5      S:  a  [        S5      $ [        UR
+                  U5      R                  5       [         R                  " S5      -  5      $ )Nr   r‰   Únanéü   )	r   ÚlogÚshiftÚdropnarÆ   r+   ÚtailÚstdÚsqrt)ÚcloseÚnÚrets      r9   Úhv_anualrê   Î   s`   € Ü
+&Š&Ÿ™ Q›Ñ'Ó
+(×
+/Ñ
+/Ó
+1€CÜ
+ˆ3ƒx"ƒ}ÜU‹|ÐÜ—‘˜!“—‘Ó"¤R§W¢W¨S£\Ñ1Ó2Ð2r;   c           	      óÒ  •  [         R                  " U R                  S5       S3SS9nUR                  5       R                  S5      =(       d    /  Vs/ s H  n[	        U5      R                  5       PM     nn[
+        S[        U[        U5      5       S[        U5       S3S	S
+9  USU $ s  snf ! [         a-  n[
+        S[        U5      R                   S
+3S	S
+9  / s SnA$ SnAff = f)uj   As n aÃ§Ãµes mais lÃ­quidas, na ordem de liquidez, lidas do site do Smc_B3 (data/meta.json -> 'liquidos').rÒ   z/data/meta.jsoné   rŠ   Úliquidosu     mais lÃ­quidas (Smc_B3): z de u
+    disponÃ­veisT©ÚflushNu;     [aviso] nÃ£o consegui ler a lista de liquidez do Smc_B3 (u   ); usando sÃ³ opcoes_ativos.txt)rs   r•   ÚrstriprR   rÈ   rÉ   Úprintr)   rÆ   rY   rš   r›   )rj   rè   rŸ   rž   Úlstr¡   s         r9   Úliquidos_smcró   Õ   sÛ   € ðÜLŠL˜DŸK™K¨Ó,Ð-¨_Ð=ÀrÑJˆØ()¯©«¯©°ZÓ(@×(FÀBÐ(FÓHÒ(F !Œs1‹v|‰|Ž~Ñ(FˆÐHÜ
+Ð+¬C°´3°s³8Ó,<Ð+=¸TÄ#ÀcÃ(ÀÈ=ÐYÐaeÒfØ2Aˆwˆùò Iøô ó Ü
+ÐKÌDÐQRËG×L\ÑL\ÐK]Ð]|Ð}ð  FJò  	KØ	ûðús0   ‚AB/ Á#B*Á63B/ Â*B/ Â/
+C&Â9"C!ÃC&Ã!C&c           	      ó(  ^ • T R                  S5      m U 4S jn[        SS9 nUR                  X!5       VVs0 s H  u  pEUc  M
+  XE_M     nnnSSS5        [        S[	        W5       S[	        U5       ST  S3S	S
+9  U$ s  snnf ! , (       d  f       N<= f)u×   Candles diÃ¡rios jÃ¡ publicados pelo projeto Smc_B3 (GitHub Pages): <base>/data/<ATIVO>_1d.json.
+NÃ£o usa Yahoo: sÃ³ baixa um arquivo pequeno por ativo do prÃ³prio GitHub Pages. Ativos fora do scanner SMC ficam sem.rÒ   c                 ó\  >•  [         R                  " T SU  S3SS9nUR                  S:w  a  U S 4$ UR                  5       S   n[        R
+                  " U Vs/ s H  o3S   PM	     snU Vs/ s H  o3S   PM	     snU Vs/ s H  o3S	   PM	     snU Vs/ s H  o3S
+   PM	     snU Vs/ s H  o3S   PM	     snS.[        R                  " U Vs/ s H  o3S
+   PM	     sn5      S9nU [        U5      S:¼  a  U4$ S 4$ s  snf s  snf s  snf s  snf s  snf s  snf ! [         a    U S 4s $ f = f)Nz/data/z_1d.jsonrì   rŠ   r   ÚcandlesrQ   ÚhighÚlowrç   Úvolumer   r   )r   é   )	rs   r•   r—   rR   r    r-   rÖ   rÆ   rY   )ÚarŸ   r6   r^   r7   rj   s        €r9   ÚumÚhistoricos_url.<locals>.umæ   s5  ø€ ð
+	Ü—’ ˜v V¨A¨3¨hÐ7ÀÑDˆAØ}‰} Ó#Ø˜$wØ—‘“˜Ñ#ˆAÜ—’¹!Ó&<º!°Q¨¤y¹!Ñ&<ÑZ[ÓF\ÒZ[ÐUVÈÄyÑZ[ÑF\ÑxyÓezÒxyÐstÐhmÔfnÑxyÑezÙ<=Ó'>ºA°q¨'¬
+¹AÑ'>Ñ`aÓJbÒ`aÐ[\ÈXÌ;Ñ`aÑJbñdä#%§>¢>ÁaÓ2HÂaÀ°V´9ÁaÑ2HÓ#IñKˆAð œC ›F b›LqÐ3Ð3¨dÐ3Ð3ùò '=ùÒF\ùÒezùÚ'>ùÒJbùÚ2Høäó 	Ød7ŠNð	úsj   ƒ.D ²'D ÁC<Á'D Á-D
+Á;D ÂDÂD ÂDÂ#D Â)DÂ7D ÃDÃD Ã9D Ã<D ÄD+Ä*D+r
+   ©Úmax_workersNu#     histÃ³rico de preÃ§os do Smc_B3: ú	 ativos (Ú)Trî   )rð   r   Úmaprñ   rÆ   )rj   Úativosrü   Úexrû   r7   rÛ   s   `      r9   Úhistoricos_urlr  á   s   ø€ ð ;‰;sÓ€Dõô 
+¨Ò	*¨bØ "§¡ rÔ 2ÔDÒ 2™˜°a‹tˆqŠtÑ 2ˆÑD÷ 
++ä	Ð/´°C³¨z¸¼3¸v»;¸-ÀyÐQUÐPVÐVWÐ
+XÐ`dÒeØ€Jùó E÷ 
++Õ	*ús"   ¢B·	A=ÁA=Á
+BÁ=BÂ
+Bc                 ó  • SS K nUR                  U S-   5      R                  SSSSS9nUb  [        U5      S:  a  g U/ S	Q   R	                  5       n[        UR                  S
+S 5      b   UR                  R                  S 5      Ul        U$ )Nr   z.SAÚ1yÚ1dFr   )ÚperiodÚintervalÚauto_adjustr‹   rú   r   Útz)ÚyfinanceÚTickerÚhistoryrÆ   rã   Úgetattrr   Útz_localize)rû   Úyfr7   s      r9   Ú	_yahoo_umr  ù   s€   € ÛØ
+	‰	!e‘)Ó×$Ñ$¨D¸4ÈUÐ\^Ð$Ð_€AØy”C˜“F˜R“KØØ	Ò
+4Ñ5×<Ñ<Ó>€AÜˆqw‰w˜˜dÓ#Ñ/Ø—'‘'×%Ñ% dÓ+ˆŒØ€Hr;   c                 óæ  • [         R                  R                  X S35      n Ub=  [        R                  " 5       [         R                  R	                  U5      -
+  US-  :”  a  g[        USS9 n[        R                  " U5      nSSS5        [        R                  " WS   / SQ[        R                  " US   5      S	9n[        U5      S
+:¼  a  U$ S$ ! , (       d  f       NS= f! [         a     gf = f)ue   HistÃ³rico em disco. max_h = idade mÃ¡xima em horas (None = aceita qualquer idade, sÃ³ como plano B).ú.jsonNé  rI   rJ   rŸ   r   r°   )r   r   rú   )
+ÚosrT   Újoinr   ÚgetmtimerQ   rR   Úloadr    r-   rÖ   rÆ   rY   )Úcdirrû   Úmax_hÚprV   r6   r7   s          r9   Ú
+_cache_lerr    sÆ   € ä
+‰‰T˜S ˜;Ó'€AðØÑ¤§¢£¬r¯w©w×/?Ñ/?ÀÓ/BÑ!BÀUÈTÁ\Ó!QØÜ
+!˜gÒ
+&¨!Ü—	’	˜!“ˆA÷ 'äLŠL˜˜3™Ò)SÔ[]×[iÒ[iÐjkÐloÑjpÓ[qÑrˆÜ˜“F˜b“LˆqÐ* dÐ*÷ 'Õ
+&ûô ó Ùðús6   ¤?C# Á$
+C# Á.CÂA
+C# ÃC# Ã
+C ÃC# Ã#
+C0Ã/C0c                 óÂ  •  [         R                  " U SS9  [        [         R                  R	                  X S35      UR
+                   Vs/ s H  o3R
+                  S5      PM     snUR                  5        VVs/ s H  oD Vs/ s H  n[        U5      PM     snPM      snnS.5        g s  snf s  snf s  snnf ! [         a  n[        SU SU 3SS9   S nAg S nAff = f)	NT©Úexist_okr  ú%Y-%m-%d)r°   rŸ   u-     [aviso] nÃ£o gravei cache de histÃ³rico de r’   rî   )r  ÚmakedirsrS   rT   r  r   ÚstrftimeÚto_numpyr+   rY   rñ   )r  rû   r7   r°   Úrowr^   r¡   s          r9   Ú
+_cache_gravarr'    sÀ   € ðTÜ
+ŠD 4Ò(ÜŒRW‰W\‰\˜$ # U Ó
+,ÐUV×U\ÒU\Ó4]ÒU\ÐPQ·Z±ZÀ
+Ö5KÑU\Ñ4]ØXY×XbÑXbÔXdÔ4eÒXdÐQTÈÓ5LÊÀ1´e¸A¶hÉÔ5LÑXdÒ4eñ/gõ 	hùÒ4]ùÚ5LùÓ4eøÜó TÜ
+Ð=¸a¸SÀÀ1À#ÐFÈd×SûðTúsN   ‚A	B: ÁB*
+Á%B: Á:	B4ÂB/ÂB4Â
+B: Â*B: Â/B4Â4B: Â:
+CÃCÃCc           
+      óÐ  ^^
+^• 0 / peU  H)  n[        XU5      nUb  X…U'   M  UR                  U5        M+     [        S[        U5       SUS S[        U5       S3SS9  U(       aÔ   S	SKn	Un
+[        R                  " 5       [        R                  " 5       sm
+mU
+UU4S jnU
+(       a`  [        US9 nUR                  Xº5       H  u  pxUc  M
+  X…U'   [        XU5        M     SSS5        T
+R                  5       (       a
+  [        S
+SS9  U H-  nXu;  d  M
+  [        XS5      nUc  M  X…U'   [        SU S3SS9  M/     U$ ! [
+         a    [        S
+5        / n
+ Nèf = f! , (       d  f       N= f)uâ   HistÃ³rico diÃ¡rio (HV/candles). Ordem: cache em disco com menos de cache_h horas -> Yahoo em paralelo
+(sÃ³ quem nÃ£o estÃ¡ no cache) -> cache velho como plano B. O HV sÃ³ muda 1x por dia: normalmente 0 requisiÃ§Ãµes ao Yahoo.Nu     histÃ³rico: z do cache (ú.0fzh), z a baixar no YahooTrî   r   uO     [aviso] yfinance nÃ£o instalado (pip install yfinance); seguindo sem HV novo.c                 ór  >• TR                  5       (       d  [        R                  " 5       T-
+  T:”  a  U S 4$  U [        U 5      4$ ! [         ag  nS[	        U5      R
+                   SU 3R
+                  5       ;   d  S[        U5      R
+                  5       ;   a  TR                  5         U S 4s S nA$ S nAff = f)NÚ	ratelimitÚ ztoo many)	Úis_setr   r  rY   rš   r›   ÚlowerrÈ   Úset)rû   r¡   ÚlimitadoÚmax_segÚt0s     €€€r9   rü   Úhistoricos_yahoo.<locals>.um0  sž   ø€ Ø‰× Ñ ¤D§I¢I£K°"Ñ$4°wÓ$>Ø˜$wð
+Øœ) A›,Ð&øÜó 
+Ø¤T¨!£W×%5Ñ%5Ð$6°a¸°sÐ";×"AÑ"AÓ"CÓCÀzÔUXÐYZÓU[×UaÑUaÓUcÓGcØ—L‘L”NØ˜$w•ûð
+ús   ¸A Á
+B6ÁAB1Â+B6Â1B6rþ   uQ     [aviso] Yahoo limitou as requisiÃ§Ãµes; o resto usa o cache antigo (se houver).ú	  [info] u#   : usando histÃ³rico antigo do cache)
+r  r*   rñ   rÆ   r
+  ÚImportErrorrl   ÚEventr   r   r  r'  r-  )r  r  Úcache_hr1  r|   rÛ   Úfaltamrû   r7   r
+  Ú	faltam_yfrü   r  r0  r2  s      `         @@r9   Úhistoricos_yahoor:    s[  ú€ ð bˆÛ
+ˆÜt Ó(ˆØ‰=Ø‹FàM‰M˜!Öñ ô 
+ˆNœ3˜s›8˜* K°¸¨}¸DÄÀVÃÀ
+ÐM_Ð
+`ÐhlÒmÞ
+ð	Ûð
+ ˆIÜ —’Ó(¬$¯)ª)«+ˆˆ"÷	ö Ü#°Ò8¸BØŸF™F 2Ö1‘DAØ“}Ø!"˜A™Ü% d¨qÖ1ñ 2÷ 9ð
+ ‰× Ñ ÜÐiÐquÒvÛˆAØ|Ü˜t¨Ó-Ø“=Ø˜‘FÜ˜I a SÐ(KÐLÐTXÔYñ ð €Jøô? ó 	ÜÐcÔdØŠIð	ú÷$ 9Õ8ús$   Á%D: Â.EÃ
+EÄ:EÅEÅ
+E%c           
+      ó®  • [         R                  " SU-   5      n0 0 pTU  H^  u  pgp‰p«pÍ [        R                  " U5      U-
+  R                  nSUs=::  a  S::  d  M;  O  M?  US:¼  d  MG  U
+S:¼  d  MO  X®4US:X  a  UOUXy4'   M`     / nUR
+                  5        H_  u  nu  nnUU;   d  M  UU   S   nUR                  [        UU-
+  5      UU-
+  US   [         R                  " U* U-  S-  5      -  -   45        Ma     [        U5      S:  a  g	UR                  5         [        S
+ US	S  5       5      n[        U[        U5      S-     5      $ ! [
+         a     GM4  f = f)
+uÚ   PreÃ§o do ativo estimado sÃ³ pelas opÃ§Ãµes (paridade put-call: C - P = S - KÂ·e^(-rT)), usando os pares
+mais prÃ³ximos de 'no dinheiro'. Plano C: sÃ³ Ã© usado se nÃ£o houver histÃ³rico de preÃ§os. None se faltar dado.r   rì   r‘   r¥   gš™™™™™©?rÃ   r   ém  Nc              3   ó*   #   • U  H	  oS    v •  M     g7f)r   Nrª   ©Ú.0r^   s     r9   Ú	<genexpr>Úestimar_spot.<locals>.<genexpr>_  s   é € Ð%šW˜ŽtšWùó   ‚rÀ   rˆ   )rZ   rá   r    rÖ   r×   rY   Úitemsr*   r(   ÚexprÆ   ÚsortÚsortedr+   )r3   rÙ   ÚselicrŸ   ÚcallsÚputsrž   r<   r=   Úkr  r@   rA   rB   rÜ   ÚestÚkeyr6   Úppr¼   s                       r9   Úestimar_spotrN  K  sM  € ô 	
+ŠU‘Ó€AØbˆ4Û.2Ñ*ˆ˜! #ð	Ü—N’N 4Ó(¨4Ñ/×5Ñ5ˆDð Õ˜×Ñ ¨¥¨a°4­iØ>?¸Yd˜f“n‰U¨$°°	Ó:ñ
+ /3ð 
+€CØŸ+™+ž-‰ˆ‰YˆaØ$;Øc‘˜1‘ˆBØJ‰Jœ˜A ™F› Q¨¡V¨c°!©f´t·x²xÀÀÀTÁ	ÈCÁÓ7PÑ.PÑ%PÐQÖRñ (ô ˆ3ƒx!ƒ|ØØ‡HH„JÜÑ%˜S  !™WÓ%Ó%€AÜ”3q“6˜Q‘;‘Ó Ð øô ó 	Ûð	ús   ¨#EÅ
+EÅEc                 ó<  • U S   n[        US5      [        US5      p2X#4 Vs/ s H"  n[        R                  " U5      (       a  M   UPM$     nnU(       a  [        [        R
+                  " U5      5      O
+[        S5      n[        UR                  S   5      X#U4$ s  snf )Nr   rì   r   rß   éÿÿÿÿ)rê   rZ   r[   r+   r   ÚmeanÚiloc)r7   rç   Úhv20Úhv60r¼   ÚvalsÚhvs          r9   ÚestatisticasrW  c  sy   € Ø
+ˆg‰J€EÜ˜% Ó$¤h¨u°bÓ&9ˆ$Ø‘|Ó9’|!¬4¯:ª:°a¯=A‘|€DÐ9Þ!%ŒŒrwŠwt‹}Ô	¬5°«<€BÜ—‘˜B‘Ó  $¨bÐ0Ð0ùò :s   ¢BÁBc                  óx  •  [         R                  " [        SS9n U R                  5         U R	                  5       S   n[        [
+        US   5      R                  SS5      5      S-  nSUs=:  a  S	:  a   O  g
+U[
+        UR                  S
+S5      5      4$  g
+! [         a  n[        SU 35         S nAg
+S nAff = f)Nr‰   rŠ   rP  ÚvalorrL   Ú.éd   ç{®Gáz„?r“   r¬   rh   u!   [aviso] Selic/BCB indisponÃ­vel: )Nrh   )
+rs   r•   ÚBCB_URLÚraise_for_statusrR   r+   rÈ   ÚreplacerY   rñ   )rŸ   rA   r¼   r¡   s       r9   Ú	selic_bcbr`  k  s¶   € ð7ÜLŠLœ¨"Ñ-ˆØ	×ÑÔØf‰f‹hr‰lˆÜ”#c˜'‘lÓ#×+Ñ+¨C°Ó5Ó6¸Ñ<ˆØ!?d?ð ð ”c˜#Ÿ'™' &¨"Ó-Ó.Ð.Ð.ð ð øô ó 7Ü
+Ð1°!°Ð5×6Ð6Øûð7ús   ‚A5B Á8B Â
+B9Â!B4Â4B9c                 óh   • SS[         R                  " U [         R                  " S5      -  5      -   -  $ )Nr“   r   rˆ   )rZ   Úerfræ   r]   s    r9   Ú_cdfrc  {  s(   € Ø!”d—h’h˜q¤4§9¢9¨Q£<Ñ/Ó0Ñ0Ñ1Ð1r;   c                 ó~  • U[         R                  " U5      -  n[         R                  " X-  5      X4U-  S-  -   U-  -   U-  nXv-
+  nUS:X  a8  U [        U5      -  U[         R                  " U* U-  5      -  [        U5      -  -
+  $ U[         R                  " U* U-  5      -  [        U* 5      -  U [        U* 5      -  -
+  $ )Nrˆ   rÃ   )rZ   ræ   rá   rc  rD  )	ÚSÚKÚTrŸ   Úsigr=   ÚvtÚd1Úd2s	            r9   Ú_bsrl    s¯   € Ø	ŒtyŠy˜‹|Ñ	€BÜ
+(Š(1‘5‹/˜Q s¡¨Q¡Ñ.°!Ñ3Ñ
+3°rÑ	9€BØ	‰€BØˆvƒ~Ø”4˜“8‰|˜a¤$§(¢(¨A¨2°©6Ó"2Ñ2´T¸"³XÑ=Ñ=Ð=ØŒtxŠx˜˜˜Q™ÓÑ¤$¨ s£)Ñ+¨a´$¸°s³)©mÑ;Ð;r;   c           	      ó  • / nU R                   U R                  pC[        U5       HÀ  n[        R                  " X4SS9n[        S5       Vs/ s Hk  ov[        R
+                  " US9-   R                  U:X  d  M)  U[        R
+                  " US9-   R
+                  5       S:X  d  MT  U[        R
+                  " US9-   PMm     nnUR                  US   5        US-
+  nUS:X  d  Mº  SUS-   p4MÂ     U V	s/ s H  o™U :”  d  M
+  U	PM     sn	$ s  snf s  sn	f )Nr   ©ÚyearÚmonthÚdayé   ©r×   rÐ   rˆ   é
+   )ro  rp  r”   r    r"   Ú	TimedeltaÚweekdayr*   )
+rÙ   ÚmesesrÛ   ÚyÚmr4   r°   rÌ   Úsextasr^   s
+             r9   Ú_terceiras_sextasr{  ˆ  só   € Ø
+€CØ9‰9d—j‘j€qÜ
+5Ž\ˆÜLŠL˜a¨aÑ0ˆÜ49¸"´Ió A²I¨qÄbÇlÂlÐXYÑFZÑBZ×AaÑAaÐefÑAfÓ*Øœ2Ÿ<š<¨QÑ/Ñ/×8Ñ8Ó:¸aÑ?ó +!”b—l’l¨Ñ*Ô*±Iˆð Aà
+‰
+6˜!‘9ÔØ	ˆQ‰ˆØ7Øa˜!‘eŠqñ ñ Ó'’s! $™hA‘sÑ'Ð'ùò
+Aùò (s   Á
+(DÁ6'DÂ!DÃ-	DÃ:Dc                 óh  • [         R                  R                  [        R                  " U R                  5       5      S-  5      n[        R                  " S[        -   5      n[        US5      [        R                  " UR                  S-   SSS[        R                  " UR                  S-   SSS9R                  5       -
+  S-  -   S9/-   nUS:  a  S	OS
+n[         R                  " [        US-  U-  5      U-  US-  U5      n/ n	U GH§  n
+X£-
+  R                   nUS:  d
+  U["        :”  a  M$  X":X  a  UOS
+UR%                  SS5      -  nU GH`  n
+S GHU  n['        SUSSX-
+  -  U-  -   -  5      n[)        U[+        U
+5      US-  X_U5      UR-                  SS5      -   nUS:  a  MT  [/        SU
+R0                  -   S-
+  US:X  a  SOS-   5      nU	R3                  U S S  U [5        U
+S-  5       3U
+R7                  S5      U[        [+        U
+5      S5      [        [+        U5      S5      [5        UR9                  SS5      5      U[        R:                  " [5        UR=                  SS5      5      S 9-
+  R7                  S5      [+        [5        UR9                  SS5      5      5      /5        GMX     GMc     GMª     U	$ )!Niï¾  r   r
+   r   rÐ   rn  rÀ   é   r“   r   gffffffæ?gÍÌÌÌÌÌô?r   gš™™™™™é?gš™™™™™õ?rÂ   g¸…ëQ¸¾?ç      Ð?r<  r   r\  g¸…ëQ¸ž?éA   rÄ   r¤   r‰   r"  rˆ   r   gš™™™™™ñ?r¥   rs  )r   r   r   r   r   r   rZ   rá   ÚSELIC_PADRAOr{  r    r"   ro  rv  ÚarangeÚroundr×   ÚDTE_MAXr%   r'   rl  r+   r&   Úchrrp  r*   rÊ   r$  r,   ru  Úintegers)rº   re  rV  rÙ   r0   rŸ   ÚvencsÚstepÚksr3   r¼   rÜ   rj   rf  r=   rh  r  Úletras                     r9   Údemo_opcoesrŠ  –  s›  € Ü
+)‰)×
+Ñ
+¤§
+¢
+¨5¯<©<«>Ó :¸VÑ CÓ
+D€CÜŠ”\Ñ!Ó"€AÜ˜d AÓ&¬"¯,ª,¸D¿I¹IÈ¹MÐQRÐXZÐ^_Ôbd×bnÒbnÐtx×t}Ñt}ð  ABñ  uBð  JKð  QSñ  cT÷  c\ñ  c\ó  c^ñ  _^ð  bcñ  ^cñ  Ycñ  +dð  *eñ  
+e€EØb“&‰3˜c€DÜ	Š”5˜˜S™ 4™Ó(¨4Ñ/°°S±¸$Ó	?€BØ
+€DÜ
+ˆØ‘‰ˆØ!‹8tœg“~ÙØ“h‘ C¨3¯;©;°s¸DÓ+AÑAˆÜˆAÜ'Ü˜$ ¨¨D°A±E©N¸QÑ,>Ñ(>Ñ ?Ó@Ü˜œ5 ›8 T¨C¡Z°¸Ó>ÀÇÁÈAÈtÓATÑTØt“8ÙÜ˜B §¡™L¨1Ñ,°d¸e³m±ÈÑKÓLØ—‘  b q 	˜{¨5¨'´#°a¸"±f³+°Ð?ÀÇÁÈJÓAWÐY]Ô_dÔejÐklÓemÐopÓ_qÜ"¤5¨£8¨QÓ/´°S·]±]À3ÈÓ5LÓ1MØ"¤R§\¢\´s¸3¿<¹<ÈÈ1Ó;MÓ7NÑ%OÑO×YÑYÐZdÓeÜ"¤3 s§}¡}°Q¸Ó':Ó#;Ó<ð>÷ ?ô
+ (ô ñ ð  €Kr;   z,https://www.fundamentus.com.br/resultado.phpc                 ó€  • [         R                  " [        U 5      SSS9S   SS/   R                  5       nUS   nUR                  [
+        :X  aG  UR
+                  [        5      R                  R                  SSSS	9R                  R                  SSSS	9n[         R                  " US
+S9US'   US   R
+                  [        5      R                  R                  5       R                  R                  5       US'   X3S   R                  R                  S
+5      US   S:„  -     nUR                  SSS9R                  S5      nU(       aP  [        US   R!                  U5      US   R!                  U5      5       VVs/ s H  u  pVU[#        U5      4PM     snn$ US   R!                  U5      R%                  5       $ s  snnf )ui   Tabela do Fundamentus -> tickers ordenados por liquidez mÃ©dia de 2 meses (Liq.2meses), maiores primeiro.rL   rZ  )ÚdecimalÚ	thousandsr   ÚPapelz
+Liq.2mesesrh   F)ÚregexÚcoerce)ÚerrorsÚliqz[A-Z]{4}(3|4|5|6|11))Ú	ascending)r    Ú	read_htmlr   ÚcopyÚdtypeÚobjectÚastyperÈ   r_  Ú
+to_numericÚstriprÉ   Ú	fullmatchÚsort_valuesÚdrop_duplicatesÚzipÚheadr+   Útolist)Úhtmlrè   Úcom_liqÚdfr’  rû   rÍ   s          r9   Ú_tickers_fundamentusr¤  ´  s  € ä	Š”h˜t“n¨c¸SÑ	AÀ!Ñ	DÀgÈ|ÐE\Ñ	]×	bÑ	bÓ	d€BØ
+ˆ\Ñ
+€CØ
+‡yy”FÓØj‰jœ‹o×!Ñ!×)Ñ)¨#¨r¸Ð)Ð?×CÑC×KÑKÈCÐQTÐ\aÐKÐbˆÜ—
+’
+˜c¨(Ñ3€B€uIØW‘+×$Ñ$¤SÓ)×-Ñ-×3Ñ3Ó5×9Ñ9×?Ñ?ÓA€B€wKØ	ˆw‰KO‰O×%Ñ%Ð&=Ó>À"ÀUÁ)ÈaÁ-ÑPÑ	Q€BØ	‰˜¨ˆÐ	/×	?Ñ	?ÀÓ	H€BÞÜ*-¨b°©k×.>Ñ.>¸qÓ.AÀ2ÀeÁ9Ç>Á>ÐRSÓCTÔ*UÔVÒ*U¡$ !”E˜!“H“
+Ñ*UÒVÐVØ
+ˆg‰;×Ñ˜AÓ×%Ñ%Ó'Ð'ùó Ws   Å;F:c           
+      óZ  • [         R                  R                  US5      n [        R                  " 5       [         R                  R	                  U5      -
+  US-  :  ao  [        USS9 n[        R                  " U5      S   nSSS5        [        W5      [        U S5      :¼  a*  [        S[        U [        U5      5       S	US
+ S3SS
+9  USU  $  [        R                  " [        [        SS9nUR!                  5         [#        UR$                  ['        U S5      SS9nU VV	s/ s H  u  p‰UPM	     nnn	[        U5      S:  a  [)        S[        U5       S35      e[         R*                  " USS9  [-        X5U VV
+s0 s H  u  pŠXŠ_M	     sn
+n[.        R0                  " [2        R4                  5      R7                  SS9S.5        [        S[        U [        U5      5       S3SS
+9  USU  $ ! , (       d  f       GNk= f! [         a     GN8f = fs  sn	nf s  sn
+nf ! [         a‹  n[        S[9        U5      R:                   SU S3SS
+9   [        USS9 n[        R                  " U5      S   SU  sSSS5        s SnA$ ! , (       d  f        SnAg= f! [         a
+    / s s SnA$ f = fSnAff = f)uµ   Candidatos = as n aÃ§Ãµes mais lÃ­quidas do Fundamentus. Cache de 24h (a liquidez de 2 meses muda devagar).
+Falhou e nÃ£o hÃ¡ cache? devolve [] e o chamador usa o opcoes_ativos.txt.ú_universo.jsonr  rI   rJ   ÚtickersNrú   z  universo: z tickers do cache (<r)  úh)Trî   )rŒ   r‹   éú   )r¢  ztabela com poucos tickers (r  r   Úseconds©Útimespec)r§  r’  Ú
+fetched_atu&    tickers mais lÃ­quidos do Fundamentusu%     [aviso] Fundamentus indisponÃ­vel (r’   z,); tentando cache antigo / opcoes_ativos.txt)r  rT   r  r   r  rQ   rR   r  rÆ   r)   rñ   rY   rs   r•   ÚFUNDAMENTUS_URLr–   r^  r¤  r˜   r'   r™   r#  rS   r   Únowr	   ÚutcÚ	isoformatrš   r›   )rè   r  r  r  rV   rò   rŸ   Úrkrû   r4   rÍ   r¡   s               r9   Úuniverso_fundamentusr³  Ã  s^  € ô 	‰‰TÐ+Ó,€Að
+Ü9Š9‹;œŸ™×)Ñ)¨!Ó,Ñ,¨u°t©|Ó;Üa 'Ò*¨aÜ—i’i “l 9Ñ-÷ +ä3‹xœ3˜q "›:Ó%Ü˜¤S¨¬C°«HÓ%5Ð$6Ð6JÈ5ÐQTÈ+ÐUWÐXÐ`dÒeØ˜2˜AwðÜLŠLœ´'À2ÑFˆØ	×ÑÔÜ
+! !§&¡&¬#¨a°«+¸tÑ
+DˆÙÔ šR‘TQ‹q™RˆÑ Üˆs‹8b‹=ÜÐ:¼3¸s»8¸*ÀAÐFÓGÐGÜ
+ŠD 4Ò(ÜˆQ¹"Ô(=º"±$°!¨ª¹"Ò(=ÌXÏ\Ê\ÔZb×ZfÑZfÓMg×MqÑMqð  |EÐMqð  NFñ  Gô  	HÜ
+œS ¤C¨£HÓ-Ð.Ð.TÐUÐ]aÒbØ2Aˆwˆ÷# +Ö*ûô
+ ó 
+Úð
+üó !ùó )>øô ó Ü
+Ð5´d¸1³g×6FÑ6FÐ5GÀrÈ!ÈÐLxÐyð  BFò  	Gð	Üa 'Ò*¨aÜ—y’y “| IÑ.¨r°Ð2÷ +×*×*×*Ð*ûäó 	ØIð	þðús¬   ¢AG8 Á(G&ÂA
+G8 ÃAH Ä H	Ä.A
+H Å8HÆAH Ç&
+G5Ç0G8 Ç8
+HÈHÈ	H È
+J*È$J%É
+JÉI9É*	JÉ3J*É9
+J	ÊJÊJÊJ"ÊJ%ÊJ*Ê!J"Ê"J%Ê%J*c           
+      óÚ  • 0 n [        [        R                  R                  US5      SS9 n[        R
+                  " U5      R
+                  S0 5      nSSS5        [        U5       VVs/ s H#  u  pgUS-   XvU-  S-   UR
+                  U5      S.PM%     nnn [        R                  " [        R                  R                  U 5      =(       d    SS	S
+9  [        U [        R                  " [        R                  5      R!                  SS9S
+U[#        U5      US.5        U$ ! , (       d  f       NÑ= f! [         a     Nàf = fs  snnf ! [         a  n	[%        SU  SU	 3S	S9   Sn	A	U$ Sn	A	ff = f)uq   Grava a lista final (ordem de liquidez) com o lote de cada ativo. Serve de conferÃªncia e fica publicada no site.r¦  rI   rJ   r’  Nr   )Úposrž   ÚloteÚ
+liq_2mesesrZ  Tr   rª  r«  zFundamentus (Liq.2meses))Ú	gerado_emÚfonteÚtamanho_loterè   r  u     [aviso] nÃ£o gravei r’   rî   )rQ   r  rT   r  rR   r  r•   rY   Ú	enumerater#  ÚdirnamerS   r   r¯  r	   r°  r±  rÆ   rñ   )
+rT   r§  r  Útam_loter’  rV   rÌ   rž   Úitensr¡   s
+             r9   Úescrever_universor¿  ä  s@  € à
+€Cð
+Ü
+”"—'‘'—,‘,˜tÐ%5Ó6ÀÒ
+IÈQÜ—)’)˜A“,×"Ñ" 5¨"Ó-ˆC÷ Jô foÐovÔewÔxÒewÑ]aÐ]^Q˜‘U °©M¸AÑ,=ÈSÏWÉWÐUVËZÔ
+XÑew€EÑxð@Ü
+Š”B—G‘G—O‘O DÓ)×0¨S¸4Ò@ÜˆT¤§¢¬h¯l©lÓ!;×!EÑ!EÈyÐ!EÐ!YÐd~Ø$,´3°u³:ÈñPô 	Qð €L÷ JÕ
+Iûäó 
+Ùð
+üãxøô
+ ó @Ü
+Ð& t f¨B¨q¨cÐ2¸$Ö?Ø€Lûð@úsM   „(D/ ¬'DÁD/ Á)*D?ÂBE Ä
+D,Ä(D/ Ä,D/ Ä/
+D<Ä;D<Å
+E*ÅE%Å%E*c                 óÆ   • [        U R                  U R                  5      nU(       d9  [        U R                  5      SU R                   n[        S[
+        U5       S3SS9  U$ )uQ   As N aÃ§Ãµes mais lÃ­quidas (Fundamentus; cache 24h). Plano B: opcoes_ativos.txt.Nz2  [aviso] usando opcoes_ativos.txt como universo (z ativos)Trî   )r³  Ú
+n_universoÚ
+hist_cacheÚ
+ler_ativosr  rñ   rÆ   )Úargsrò   s     r9   Úobter_universorÅ  ö  sQ   € ä
+˜tŸ™°·±Ó
+@€CÞÜ˜Ÿ™Ó%Ð&6 t§¡Ð7ˆÜ
+ÐBÄ3ÀsÃ8À*ÈHÐUÐ]aÒbØ€Jr;   c                 óx  • [        U 5      n[        [        R                  R	                  U R
+                  SSS5      XR                  U R                  5        [        U5      * U R                  -  * n/ SSpTn[        R                  SS  HA  nU(       a  SnM  US:X  a  SnM  UR                  S	5      (       a  M0  UR                  U5        MC     [        S
+[        U5       SU SU R                   3SS
+9  [        R                  " 5       n[        SUS-   5       H­  n[        SU SU SSR	                  XS-
+  U R                  -  XPR                  -   5       S3SS
+9   [         R"                  " [        R$                  S[        R                  R'                  [(        5      /U-   S[+        U5      /-   U R,                  S-   S-  S9  M¯     [        S[        R                  " 5       U-
+  S S3SS
+9  g! [         R.                   a    [        SU S3SS
+9   Mü  [0         a  n[        SU SU 3SS
+9   SnAGM  SnAff = f)uÞ   --lote 0: roda os lotes (de --lote-tam ativos) um por vez, cada um em um processo prÃ³prio e com tempo limite.
+Um lote que falhar ou estourar o tempo nÃ£o derruba os outros; os dados dos lotes anteriores ficam preservados.r¬   Úopcoesúuniverso_80.jsonFr   Nú--loteTz--lote=z
+Universo: u    aÃ§Ãµes em z lote(s) de rî   z
+
+=== LOTE rÒ   r’   ú, z ===z-urÐ   r   rŠ   z
+[aviso] lote z6 passou do tempo e foi interrompido; os demais seguem.z	 falhou: z
+Todos os lotes terminaram em r)  ús.r   )rÅ  r¿  r  rT   r  rÛ   rÂ  Úlote_tamrÆ   ÚsysÚargvÚ
+startswithr*   rñ   r   r”   Ú
+subprocessÚrunÚ
+executableÚabspathÚ__file__rÈ   Úmax_minÚTimeoutExpiredrY   )	rÄ  Úuniversorè   rj   ÚskiprÌ   rû   r2  r¡   s	            r9   Úrodar_lotesrÙ  ÿ  s  € ô ˜dÓ#€HÜ”b—g‘g—l‘l 4§8¡8¨V°XÐ?QÓRÐT\×^mÑ^mÐos×o|Ño|Ô}Üˆx‹=ˆ.˜DŸM™MÑ
+)Ð*€AØ˜˜q€DÜ
+X‰Xab‹\ˆÞØˆDÙØ‹=ØˆDÙØ<‰<˜	×"Ñ"ÙØ‰AŽñ ô 
+ˆJ”s˜8“}o \°!°°LÀÇÁÀÐ
+PÐX\Ò]Ü	
+Š‹€BÜ
+1a˜!‘eŽ_ˆÜ
+˜A˜3˜a ˜s " T§Y¡Y¨x¸Q¹À$Ç-Á-Ñ8OÐPQ×TaÑTaÑPaÐ/bÓ%cÐ$dÐdhÐiÐquÒvð	?ÜNŠNœCŸN™N¨D´"·'±'·/±/Ä(Ó2KÐLÈtÑSÐW_ÔadÐefÓagÐVhÑhØ$(§L¡L°1Ñ$4¸Ñ#:ô
+<ñ ô 
+Ð+¬D¯IªI«K¸"Ñ,<¸SÐ+AÀÐ
+DÈDÒQØøô ×(Ñ(ó 	iÜM ! Ð$ZÐ[ÐcgÕhÜó 	?ÜM !  I¨a¨SÐ1¸×>Ñ>ûð	?ús   ÅA(G/Ç/"H9È	H9ÈH4È4H9c                 ób  • [        U SS9 nU Vs/ s H2  o"R                  S5      S   R                  5       R                  5       PM4     nnS S S 5        [	        5       / pTW H5  nU(       d  M  Xd;  d  M  UR                  U5        UR
+                  U5        M7     U$ s  snf ! , (       d  f       N[= f)NrI   rJ   Ú#r   )rQ   rË   rš  rÉ   r/  Úaddr*   )rT   rV   r8   ÚtsÚseenrÛ   rž   s          r9   rÃ  rÃ    sŠ   € Ü	
+ˆd˜WÒ	%¨Ù78Ó
+9²q°!g‰gc‹l˜1‰o×#Ñ#Ó%×+Ñ+Ö-±qˆÐ
+9÷ 
+&ä“rˆ#Û
+ˆßˆ1•ØH‰HQŒKØJ‰JqŽMñ ð €Jùò
+ :÷ 
+&Õ	%ús   ‹B 9BÁ	B ÂB Â 
+B.c                 óD  •  U R                  S5      S-   n[        R                  " X1 S3-   SS9n[        R                  " X1 S3-   SS9nUR                  S:X  aŸ  UR                  S:X  a  UR	                  5       UR	                  5       pvUR                  S5      (       aZ  [        [        R                  R                  X! S35      U5        [        [        R                  R                  X! S35      U5        U$ g! [         a  n[        S	U S
+U 35         SnAgSnAff = f)uN   Ãšltima coleta boa publicada no Pages (quando a coleta atual do ativo falhar).rÒ   ú
+/data/opcoes/r  rì   rŠ   ú_px.jsonr   r3   z$   [aviso] sem coleta anterior para r’   N)rð   rs   r•   r—   rR   rS   r  rT   r  rY   rñ   )	Úprev_urlrº   rÛ   rj   rû   r  ÚjaÚjpr¡   s	            r9   Úrecuperar_anteriorrå  *  sú   € ðCØ‰˜sÓ# oÑ5ˆÜLŠL˜ '¨ Ñ/¸Ñ<ˆÜLŠL˜ '¨Ð 2Ñ2¸BÑ?ˆØ=‰=˜CÓ A§M¡M°SÓ$8Ø—V‘V“X˜qŸv™v›xØv‰vf~‰~Ü”R—W‘W—\‘\ #¨° Ó7¸Ô<Ü”R—W‘W—\‘\ #¨°Ð'9Ó:¸BÔ?Ø	ð øô ó CÜ
+Ð4°U°G¸2¸a¸SÐA×BÐBØûðCús   ‚C6C: Ã:
+DÄDÄDc           	      óì  ^ ^•  [         R                  " T R                  S5      S-   SS9nUR                  5       nU Vs1 s H  ofS
+   iM	     nn/ nUR                  S/ 5       Vs/ s H  ofS
+   U;  d  M
+  UPM     n	n[        SS
+9 n
+[        XšR                  UU 4S jU	5      5       HB  u  pkU(       d  M  UR                  US
+   [        US   5      UR                  S5      SS.5        MD     S	S	S	5        [        S[        U5       S3SS9  X„R                  S/ 5      4$ ! [         a/  n[        S[
+        U5      R                   S3SS9  / / 4s S	nA$ S	nAff = fs  snf s  snf ! , (       d  f       N~= f)uv   Se a coleta atual quase nÃ£o trouxe nada, recupera TODOS os ativos da Ãºltima coleta boa publicada (marcados 'stale').rÒ   z/data/opcoes/meta.jsonrì   rŠ   z.  [aviso] sem coleta anterior para restaurar (r  Trî   Nrž   r  r
+   rþ   c                 ó$   >• [        TU S   T5      $ )Nrž   )rå  )r^   rÛ   râ  s    €€r9   Ú<lambda>Ú restaurar_tudo.<locals>.<lambda>G  s   ø€ Ô0BÀ8ÈQÈsÉVÐUXÔ0Yr;   r3   r­  ©rž   rè   r­  Ústalez  restaurados u)    ativo(s) da Ãºltima coleta boa publicadarí   )
+rs   r•   rð   rR   rY   rñ   rš   r›   r   rž  r  r*   rÆ   )râ  rÛ   rØ   rŸ   ry  r¡   r^   ÚtemÚnovosÚalvor  rã  s   ``          r9   Úrestaurar_tudorï  ;  sR  ù€ ðÜLŠL˜Ÿ™¨Ó-Ð0HÑHÐRTÑUˆØ
+F‰F‹Hˆñ !Ó
+!š5aˆSŒ6™5€CÐ
+!Ø€EØ—u‘u˜X rÔ*Ó@Ò*!°©f¸CÑ.?AÑ*€DÐ@Ü	¨Ò	*¨bÜ˜Ÿv™vÕ&YÐ[_Ó`Öa‰EˆAßˆrØ—‘ 1 S¡6´°B°v±J³ÈrÏvÉvÐVbÓOcÐnrÑsÖtñ b÷ 
++ô 
+ˆNœ3˜u›:˜,Ð&OÐ
+PÐX\Ò]Ø—%‘%˜
+ BÓ'Ð'Ð'øô ó Ü
+Ð>¼tÀA»w×?OÑ?OÐ>PÐPQÐRÐZ^Ò_Ø2ˆv
+ûðüò "ùâ@ß	*Õ	*ús@   „7D ¿EÁ%E Á5E Â+E%Â58E%Ä
+EÄ)$EÅ
+EÅEÅ%
+E3c           	      óþ  • 0 SpCSSSSS.nU GHU  n [        [        R                  R                  XS    S35      SS9 n[        R
+                  " U5      nSSS5        [        R                  " [        R                  " WS   5      [        S	S
+9-
+  R                  5       5      n	/ n
+US    H{  nUS   S
+:w  a  M  [        R                  " US   5      U	-
+  R                  nX\S:  a  SOUS:  a  SO	US:  a  SOS==   S-
+  ss'   X,s=::  a  S::  d  Mf  O  Mj  U
+R                  U5        M}     U
+(       a2  US   UR                  S5      US   U
+S.X6S   '   U[        U
+5      -
+  nGMU  GMX     [!        SU SU S3S S!9  US:X  a  [!        S"U S#3S S!9  [#        [        R                  R                  U S$5      [$        US%.5        U$ ! , (       d  f       GNp= f! [         a!  n
+[!        SUS    SU
+ S35         Sn
+A
+GMê  Sn
+A
+ff = f)&u½   Um Ãºnico arquivo com sÃ³ as CALLs de 60â€“730 dias de todos os ativos: a tela "Calls longas" baixa
+1 arquivo pequeno em vez de um por ativo (muito mais rÃ¡pido, principalmente no celular).r   )ú<60dú60-179dú180-364dú>=365drž   r  rI   rJ   Nr­  r¥   ©Úhoursr3   rˆ   rÃ   r   r   rñ  é´   rò  r<  ró  rô  rC   re  rV  )re  rV  r­  r3   z   [aviso] longas: z ignorado (r  z(  CALLs negociadas coletadas por prazo: z  (entram no longas.json: DTE z-730)Trî   z,  [aviso] nenhuma CALL negociada com DTE >= uF   : baixe --leaps-min (ex.: 90) ou a fonte nÃ£o tem LEAPS com negÃ³cios.úlongas.json)ÚcolsÚassets)rQ   r  rT   r  rR   r  r    r"   r   ÚdaterÖ   r×   r*   r•   rÆ   rY   rñ   rS   ÚCOLS)rÛ   rØ   Údminrú  rè   ÚfaixasÚitemrV   rû   rj   r3   rŸ   rÜ   r¡   s                 r9   Úgerar_longasr   N  sý  € ð AˆAØ A°1ÀÑ
+B€FÜˆð	DÜ”b—g‘g—l‘l 3°©9¨+°UÐ(;Ó<ÀwÒOÐSTÜ—I’I˜a“L÷ Pä—<’<¤§¢¨a°©oÓ!>ÄÐQRÑASÑ!S× YÑ YÓ [Ó\ˆDØˆDØv”YØQ‘4˜6“>ÙÜŸš q¨¡tÓ,¨tÑ3×9Ñ9Ø¨£‘v¸TÀC»Z±	Ð[_ÐbeÓ[eÉZÐksÓtÐxyÑyÓtØÕ& 3×&Ñ&Ø—K‘K –Nñ
+ ö Ø*+¨C©&¸¿¹¸d»ÐSTÐUaÑSbÐlpÑ$q˜C‘yÑ!Ø”S˜“Y‘“ò ñ ô$ 
+Ð4°V°HÐ<ZÐ[_ÐZ`Ð`eÐ
+fÐnrÒsØˆAƒvÜ
+Ð<¸T¸Fð  CIð  Jð  RVò  	WÜŒ‰‰c˜=Ó	)´DÀFÑ+KÔLØ€H÷) PÖOûô ó 	DÜÐ'¨¨S©	 {°+¸a¸SÀÐB×CÓCûð	Dús6   ’-G¿F?ÁB6GÄAGÆ?
+G	Ç	GÇ
+G<ÇG7Ç7G<c           
+      ó4  • [        SS5      n[        S[         35        UR                  [         SU  S35      n[	        U5      (       d.  [        SUR
+                  =(       d    [
+        U5      S S  35        gUS	   R                  S
+5      =(       d    /  Vs/ s H  o3R                  S5      PM     nn[        S[        U5       S
+US S  S35        [        R                  " [        R                  " [        R                  5      [        SS9-
+  R!                  5       5      n[#        XE5      nU(       d  [        S5        gUR                  [         SU  SUS    35      n[	        U5      (       d  [        SUS    SUR
+                   35        gUS	   R                  S5      =(       d    / n[        S[%        US	   R'                  5       5       35        [        SUS    S[        U5       S35        US S  H-  n[        S[)        U5       V	V
+s0 s H  u  pšXš_M	     sn
+n	5        M/     [+        XUS   5      n[        S[        U=(       d    / 5       35        U=(       d    / S S  H&  n[        S[-        [/        [0        U5      5      5        M(     gs  snf s  sn
+n	f )Nrˆ   re   u   [diag] endereÃ§o base: rµ   z&&listarVencimentos=true&cotacoes=falsez%[diag] FALHOU ao listar vencimentos: i,  r   r¬   r¶   r·   z[diag] z vencimentos: rÓ   z ...r¥   rõ  z [diag] nenhum vencimento futuro.r¾   r   z[diag] FALHOU ao baixar r’   r¿   z[diag] chaves de data: z[diag] vencimento u/    linhas cruas. As 3 primeiras (Ã­ndice: valor):z   u5   [diag] linhas aproveitadas (negÃ³cios>0 e volume>0): )rb   rñ   r¸   r¢   r±   ry   rÈ   r•   rÆ   r    r"   r   r¯  r	   r°  r   rû  rÝ   ÚlistÚkeysr»  rÎ   r¯   rž  rü  )rº   r¹   r°   r^   ÚvsrÙ   Úvvr»   rŸ   rJ  r¼   Úoks               r9   Údiagnosticor  l  sD  € Ü
+
+ˆa‹+€CÜ	Ð#¤H :Ð
+.Ô/Ø‰œzÐ!>¸u¸gÐEkÐlÓm€AÜA;‰;Ü
+Ð5°c·h±h×6NÄ#ÀaÃ&ÈÈ#À,Ð5OÐPÔQØØ#$ V¡9§=¡=°Ó#?×#EÀ2Ð#EÓ	GÒ#E˜Q%‰%Ž.Ñ#E€BÐ	GÜ	ˆG”C˜“G9˜N¨2¨b¨q¨6¨(°$Ð
+7Ô8Ü
+<Š<œŸš¤h§l¡lÓ3´iÀaÑ6HÑH×NÑNÓPÓQ€DÜ	˜RÓ	&€BÞ
+Ü
+Ð0Ô1¸!Ø‰œzÐ!>¸u¸gÐExÐy{Ð|}Ñy~Ðxð  Aó  	B€AÜA;‰;Ü
+Ð(¨¨A©¨¨r°#·(±(°Ð<Ô=ÀaØ
+ˆF‰)-‰-Ð(Ó
+)×
+/¨R€CÜ	Ð#¤D¨¨6©¯©Ó)9Ó$:Ð#;Ð
+<Ô=Ü	Ð˜r !™u˜g R¬¨C« zÐ1`Ð
+aÔbØ
+!‹WˆÜ
+ˆe¤y°¤|Ô4¢|™t˜qa’d¡|Ò4Ö5ñ ä	S  A¡Ó	'€BÜ	ÐAÄ#ÀbÇhÈBÃ-ÀÐ
+QÔRØhB˜˜‹^ˆÜ
+ˆe”Tœ#œd A›,Ó'Ö(ñ àùò% 
+Hùó 5s   ÂJÈ
+JÚreturnc                  ó¼(  ^B^C^D^E^F^G^H^I^J^K^L^M^N• [         R                  " 5       n U R                  SSS9  U R                  SSS9  U R                  SSSS/S	S
+9  U R                  S[        SS
+S9  U R                  SSS9  U R                  SSS9  U R                  S[        SSS9  U R                  S[        SSS9  U R                  S[        SSS9  U R                  S[        SSS9  U R                  S [        S!S"S9  U R                  S#[        S$S%S9  U R                  S&[        S'S(S9  U R                  S)[        S*S+S9  U R                  S,S-S.S/9  U R                  S0[        S1S2S9  U R                  S3SS4S/9  U R                  S5SS6S79  U R                  S8[        S S9S9  U R                  S:[        S;S<S9  U R                  S=[        S>S?S9  U R                  S@SSAS79  U R                  SBSSCS/9  U R                  SDSSES/9  U R                  5       mCTCR                  (       a1  [        TCR                  R                  5       R                  5       5      $ TCR                  (       a|  [        TC5      n[        SFUTCR                  TCR                  5      nU H0  n[        SGUSH   SI SJUSK   SL SMUSN    SOUSP   b  USP   OSQ 35        M2     [        SR[!        U5       SS35        gTCR"                  S:X  a  [%        TC5      $ [&        R(                  R+                  TCR,                  STSU5      mK[&        R.                  " TKSVSW9  [0        R0                  " 5       nUTCR2                  S'-  -   n[4        R6                  " [8        R:                  5      mB[<        R>                  " TB[A        SXSY9-
+  RC                  5       5      mG/ / pvTCR"                  b°  TCRD                  (       dŸ  [        TC5      nUTCR"                  SZ-
+  TCR                  -  TCR"                  TCR                  -   nSTCl#        U(       d&  [        S[TCR"                   S\[!        U5       SS35        g[        S[TCR"                   S]S^R+                  U5       3SVS_9  OATCRH                  S:X  a1  TCRD                  (       d   [K        TCRL                  TCR                  5      nU(       d"  TCR"                  c  [O        TCRP                  5      nTCRR                  (       a€  TCRR                  RU                  S`5       Vs/ s H7  oˆR                  5       (       d  M  UR                  5       R                  5       PM9     n	nU	 Vs/ s H  oˆU;   d  M
+  UPM     sn=(       d    U	n[        Sa[!        U5       SbTCRD                  (       a  ScOSd Se35        TCRD                  (       a  [V        Sf4O	[Y        5       u  mMn
+TCRD                  (       a  SfO
+TM(       a  SgOShnTMc  [V        mM[        SiTMSj-  Sk SlU U
+(       a  SmU
+-   OS Se35        TCR"                  b³  TCRD                  (       d¢  TCRZ                  (       a‘  [&        R(                  R]                  [&        R(                  R+                  TKSn5      5      (       dO  [_        TCRZ                  TK/ 5      u  pÍU(       a/  [a        [&        R(                  R+                  TKSn5      U/ U
+/ So.5        [c        TCRd                  TCRf                  5      mJ/ / 0 npþ[!        U5      nTBRi                  SpSq9mHUGUHUIUKUM4Sr jnUC4Ss jmFU Vs0 s H  nU/ _M     snmL0 mI0 mE/ n0 nUCUEUJUL4St jnUBUCUK4Su jnUCUF4Sv jnTCRD                  (       a7  U" U5      nU H'  n[k        UU   5      u  n  nn[m        UUUTG5      TLU'   M)     GOD[0        R0                  " 5       nXEU-
+  Sw-  -   nTCRF                  (       a  UOUTJl7        / nSx H'  n[q        [s        TJU5      TG[t        5      nU(       d  M'    O   U Vs0 s H  nU[w        U5      _M     n nU(       d!  U H  nTJRx                  =(       d    SyTEU'   M     UG4Sz jmD[        S{[0        R0                  " 5       U-
+  S| S}3SVS_9  TCRF                  (       Ga+  UCUD4S~ jn!U VV"s/ s H  nU!" U U   5        H  n"UU"4PM	     M     n#nn"[        S[!        U5       S€[!        U#5       S3SVS_9  U" U#U5      n$U Vs0 s H  nU[{        S‚ TLU    5       5      _M     snmN[}        U Vs/ s H  nTLU   (       d  M  UPM     snUN4Sƒ jS„9nU Vs/ s H  nTLU   (       a  M  UPM     n%nU%(       a(  [        S…[!        U%5       S†S^R+                  U%5       3SVS_9  US TCRF                   n[        S‡[!        U5       SˆS^R+                  U5       3SVS_9  [w        TL5       H  nUU;  d  M  TLU	 M     U$ V&s/ s H  n&U&S   TL;   d  M  U&PM     n$n&TL VV"V's1 s H(  nTLU    V's1 s H  n'U'SZ   iM
+     sn'  H  n"UU"4iM	     M*     sn'n"nU# VV"s1 s H
+  u  nn"UU"4iM     sn"n-  n(U VV"s/ s HA  nU U     H4  n"SZTD" U"5      s=::  a  TCR~                  ::  d  M"  O  M&  UU"4U(;  d  M0  UU"4PM6     MC     n)nn"Sn*/ n+U H±  nU U    V"s/ s H  n"TD" U"5      TCR€                  :¼  d  M  U"PM     n,n"U,(       a  TCR‚                  S:”  a  U" U5      OS n-U-(       a  U-S   OS n.U-(       a  U-SZ   TIU'   U, H=  n"U.b$  U"U.;   a  TLU   R…                  U.U"   5        U*SZ-
+  n*M*  U+R‡                  UU"45        M?     M³     [        S‰TCR~                   SŠ[!        U)5       S‹TCR€                   SŠ[!        U+5       SŒU* STCR‚                  SŽ S3
+SVS_9  U$U" U)U+-   U5      -
+  n$GOD/ Sn*n/U Hï  nU U    V"s/ s H  n"TD" U"5      TCR€                  :¼  d  M  U"PM     n,n"U,(       a  TCR‚                  S:”  a  U" U5      OS n-U-(       a  U-S   OS n.U-(       a  U-SZ   TIU'   U/U U    V"s/ s H*  n"SZTD" U"5      s=::  a  TCR~                  ::  d  M"  O  M&  UU"4PM,     sn"-
+  n/U, H=  n"U.b$  U"U.;   a  TLU   R…                  U.U"   5        U*SZ-
+  n*M*  U/R‡                  UU"45        M?     Mñ     [        S‰TCR~                   STCR€                   SŠ[!        U/5       S‘U* S’TCR‚                  SŽ S“3SVS_9  U" U/U5      n$S TJl7        U" U5      nU$(       aÖ  [0        R0                  " 5       U:  a½  [        S”[!        U$5       S•3SVS_9  [‰        TJRf                  S–5      TJl3        S—TJlE        US-   TJl7        [        SXS˜9 n0[        U$U0R‘                  UJ4S™ jU$5      5       HD  u  u  nn"n'U'c$  TER“                  USšU" S]TJRx                   35        M0  TLU   R…                  U'5        MF     S S S 5        [!        U5      n[•        USZ5       H“  u  n1n2 TLU2   n3U3(       d6  [—        TER™                  U25      =(       d    TJRx                  =(       d    S›5      eU" U2UU2   U35      u  n4nnUR‡                  U45        [        SœU1S SžU SŸU2SL SmU4S    S¡ S¢USk S£USj-  S| S¤3
+SVS_9  M•     TJR                   (       a  [        S¬TJR                    S­35        / n6TCR"                  Gb¤  TCRD                  (       Gd’   [£        [&        R(                  R+                  TKSn5      S®S¯9 n7[¤        R¦                  " U75      n8S S S 5        [©        U5      [©        U5      U V&s1 s H  n&U&SK   iM
+     n;n&n:n9W8R™                  S°/ 5       HI  n&U&SK   U:;  d  M  U&SK   U;;  d  M  U&SK   U9;   d  M$  UR‡                  U&5        U;R«                  U&SK   5        MK     U8R™                  S±/ 5       H`  nUU:;  d  M  UU9;   d  M  UU;;  d  M  X;  d  M"  UR‡                  U5        U8R™                  S²5      =(       d    0 R™                  US5      UU'   Mb     U8R™                  S³/ 5       Vs/ s H  oˆU:;  d  M
+  UU9;   d  M  UPM     n6nU Vs/ s H  oˆU;;   d  M
+  UPM     nn[{        S´ U 5       5      n<TCRZ                  (       a  TCRD                  (       d|  TCR"                  co  U<Sµ:  ai  [        S¶U< S·3SVS_9  [_        TCRZ                  TKU5      u  n=n>UU=-
+  nU(       d  U>nU VV&s/ s H   oˆU V&s1 s H  n&U&SK   iM
+     sn&;  d  M  UPM"     sn&nUS S & [­        TKUTCR€                  5      n?[        S¸U? S¹TCR€                   Sº[&        R(                  R¯                  [&        R(                  R+                  TKS»5      5      S¼-   S½35        TBRi                  SpSq9TB[A        SXSY9-
+  R±                  S¾5      TMXº[³        TCRD                  5      XïUU=(       d    U V&s/ s H  n&U&SK   PM
+     sn&U Vs/ s H  nUR™                  U5      b  M  UPM     snU6-   [µ        [0        R0                  " 5       U-
+  SZ5      U(       a  SOTJRx                  =(       d    S¿SÀ.
+n@[a        [&        R(                  R+                  TKSn5      U@5        [{        SÁ U 5       5      nA[        SÂUA SÃ[!        U5      UA-
+   SÄ[!        U5       SÅ[0        R0                  " 5       U-
+  S| SÆ3	5        gs  snf s  snf s  snf s  snf s  sn"nf s  snf s  snf s  snf s  sn&f s  sn'f s  sn'n"nf s  sn"nf s  sn"nf s  sn"f s  sn"f s  sn"f ! , (       d  f       GN]= f! [š         aÑ  n5[        SœU1S SžU SŸU2SL S¥U5 3SVS_9  TCRZ                  (       a  [        TCRZ                  U2TK5      OS n.U.(       aZ  UR‡                  U2[!        U.S¦   5      U.R™                  S§5      SVS¨.5        [        S©U2SL SªU.R™                  S§5       Se35         S n5A5GMö  UR‡                  U25        [Ÿ        U55      S S« UU2'    S n5A5GM  S n5A5ff = f! , (       d  f       GN= f! [š         a    0 n8 GNf = fs  sn&f s  snf s  snf s  sn&f s  sn&nf s  sn&f s  snf )ÇNz--outÚsite)Údefaultz--ativoszopcoes_ativos.txtz
+--universoÚfundamentusÚarquivoum   origem dos candidatos: 'fundamentus' = aÃ§Ãµes mais lÃ­quidas (Liq.2meses); 'arquivo' = sÃ³ opcoes_ativos.txt)r  ÚchoicesÚhelpz--candr‘   uk   quantos candidatos (mais lÃ­quidos no Fundamentus) entram na triagem de opÃ§Ãµes; o --top escolhe os finais)rš   r  r  z--demoÚ
+store_true)Úactionz
+--prev-urlrh   z	--workersrÓ   uY   requisiÃ§Ãµes simultÃ¢neas ao opcoes.net.br (mais = mais rÃ¡pido, mais risco de HTTP 429)z--intervalor~  uW   segundos de espera entre requisiÃ§Ãµes (0 = sem espera; sobe sozinho se o site limitar)z	--max-ming      ,@u/   tempo mÃ¡ximo da coleta de opÃ§Ãµes, em minutosz--topr   u„   entre os candidatos de opcoes_ativos.txt, mantÃ©m sÃ³ os N mais lÃ­quidos EM OPÃ‡Ã•ES (volume negociado no opcoes.net.br); 0 = todosz--wheel-dteé-   uo   na triagem de liquidez (--top) olha sÃ³ vencimentos atÃ© N dias; as LEAPS dos N escolhidos sÃ£o baixadas depoisz--leaps-minr<  u=   LEAPS: baixa sÃ³ vencimentos com mais de N dias (padrÃ£o 365)z	--put-dter   u@   PUT/Wheel: baixa todos os vencimentos de 1 a N dias (padrÃ£o 60)z
+--leaps-ttl-hg      @zbreaproveita os vencimentos LEAPS da coleta anterior se tiverem menos de N horas (0 = sempre baixa)z--hist-cacheÚcacheu)   pasta do cache de histÃ³rico diÃ¡rio (HV))r  r  z--hist-cache-hrŽ   uK   idade mÃ¡xima (h) do cache de histÃ³rico antes de consultar o Yahoo de novoz
+--hist-urluf   opcional: endereÃ§o de outro site (GitHub Pages) com candles jÃ¡ publicados; nÃ£o Ã© usado por padrÃ£oz
+--hv-yahoouH   opcional: baixa histÃ³rico no Yahoo para HV/candles (padrÃ£o: desligado))r  r  rÉ  uI   coleta por lotes: N = sÃ³ o lote N; 0 = roda todos os lotes em sequÃªnciaz
+--lote-tamr‰   u   ativos por lote (padrÃ£o 10)z--n-universoéP   uH   quantas aÃ§Ãµes mais lÃ­quidas (Fundamentus) formam o universo dos lotesz--gerar-universouM   sÃ³ gera/mostra a lista das N aÃ§Ãµes mais lÃ­quidas (universo_80.json) e saiz--diaguP   sÃ³ diagnÃ³stico: mostra as linhas cruas da API para o ativo (ex.: --diag PETR4)z--onlyu;   sÃ³ estes ativos, separados por vÃ­rgula (ex.: PETR4,VALE3)rÈ  z  rµ  z>3z. rž   z<7z lote r¶  z
+  liq 2m: r·  zn/dzuniverso_80.json gravado (u
+    aÃ§Ãµes).r¬   rÇ  Tr   r¥   rõ  r   zLote z: vazio (universo tem r’   rÊ  rî   rL   u
+   OpÃ§Ãµes: r   ÚDEMOÚreaisr  ÚdemoÚbcbÚpadraozSelic: r[  z.2fz% (r,  z	meta.json)r  Úfalhasrí   Úsem_hvrª  r«  c                 ó’  >• Ubà  [        U5      u  p4pVSnUR                  S5      R                  5        VV	s/ s H£  u  p‰UR                  S5      [	        [        U	R                  5      S5      [	        [        U	R                  5      S5      [	        [        U	R                  5      S5      [	        [        U	R                  5      S5      [        U	R                  5      /PM¥     n
+nn	O,[        UTT5      nUc  [        S5      e[        S5      =n=pVS/ p§[        [        R                   R#                  TU  S35      S	U
+05        [        [        R                   R#                  TU  S
+35      U TX7[%        U5      [%        U5      [%        U5      T
+R'                  U T5      [(        US.
+5        U [+        U5      T[%        U5      S LS.X64$ s  sn	nf )
+NÚsmcéª   r"  rˆ   uc   sem pares put/call negociados para estimar o preÃ§o (use --hv-yahoo para obter o preÃ§o pelo Yahoo)rß   Úparidaderá  rö   r  )
+rº   r­  re  ÚS_fonterS  rT  rV  Úleaps_atrù  r3   )rž   rè   r­  rV  )rW  rä   Úiterrowsr$  r‚  r+   r   r   r   r   rÊ   r   rN  r™   rS   r  rT   r  r_   r•   rü  rÆ   )rº   r7   r3   re  rS  rT  rV  r¹  r°   rŸ   rö   rÙ   Úhoje_strÚleaps_at_porrÛ   rG  s              €€€€€r9   ÚgravarÚmain.<locals>.gravar×  s©  ø€ Ø‰=Ü ,¨Q£ÑˆATØˆEàMNÏVÉVÐTWË[×MaÑMaÔMcôeÚMcÁTÀQð Ÿ
+™
+ :Ó.´´e¸A¿F¹F³mÀQÓ0GÌÌuÐUV×U[ÑU[Ë}Ð^_ÓI`ÔbgÔhmÐno×nsÑnsÓhtÐvwÓbxÜœe A§G¡G›n¨aÓ0´#°a·h±h³-óAÙMcð 
+ñ eˆGô ˜T 4¨Ó/ˆAØ‰yÜ ð  "Gó  Hð  HÜ$ U›|Ð+ˆDÐ+4Ø'¨7ÜŒRW‰W\‰\˜# % ¨Ð1Ó
+2°YÀÐ4HÔIÜŒRW‰W\‰\˜# % ¨˜Ó
+/Ø¨(¸ÔVYÐZ^ÓV_ÔilÐmqÓirÜb“' |×'7Ñ'7¸¸xÓ'HÔRVÐ`dñ2fô 	gð ¤ T£¸(Ì#ÈbË'ÐY]ÐJ]Ñ^Ð`aÐeÐeùóes   ·B*Gc                 ó\   >• TR                   (       a  [        U SS9R                  S5      $ S $ )Né  )r/   rà   )r  r:   rä   )rº   rÄ  s    €r9   Ú	historicoÚmain.<locals>.historicoé  s&   ø€ Ø8<¿	¿	Œz˜% cÑ*×/Ñ/°Ó4ÐKÀtÐKr;   c                 óä  >• / nU (       d  U$ UTl         [        R                  " 5       [        S[        U 5      S-  5      pC[	        TR
+                  S9nU  VVs0 s H  u  pgUR
+                  [        TXg5      Xg4_M      nnn [        [        U[        SU[        R                  " 5       -
+  S-   5      S9S5       H’  u  pšXŠ   u  pgU
+R                  5       nUc  UR                  Xg45        OTU   R                  U5        X”-  S:X  d  U	[        U 5      :X  d  M^  [        SU	 S	[        U 5       S
+[        R                  " 5       U-
+  S S3S
+S9  M”     UR                  5        V
+Vs/ s H  u  p¬U
+R!                  5       (       a  M  UPM      n
+n
+nU
+(       a4  [        S[        U
+5       S3S
+S9  U
+ H  u  pïTR#                  US5        M     UR%                  SS
+S9  U$ s  snnf ! [         a     Nšf = fs  snn
+f )um   Baixa (ativo, vencimento) em paralelo atÃ© o instante 'ate'. Devolve os pares que falharam/ficaram pendentes.r   rÅ   rþ   g      @rì   rŠ   r   z    rÒ   z vencimentos (r)  zs)Trî   z#  [aviso] tempo da etapa esgotado; z" vencimento(s) ficaram sem baixar.z$tempo esgotado em alguns vencimentosF)ÚwaitÚcancel_futures)rz   r   r'   rÆ   r   r|   ÚsubmitrÎ   r»  r   Úresultr*   Úextendrñ   r   rC  ÚdoneÚ
+setdefaultÚshutdown)ÚparesÚateÚfalhouÚt1Úpassor  rû   r¼   ÚfutsrJ  rV   rŸ   ÚavÚpendÚa_Úv_rÄ  Ú
+erro_ativor¹   Úrows_pors                   €€€€r9   ÚcoletarÚmain.<locals>.coletarò  sµ  ø€ àˆÞØˆMØˆŒÜ—I’I“K¤ Q¬¨E«
+°a©Ó!8ˆEÜ
+¨D¯L©LÑ
+9ˆÙFKÔLÂe¹d¸a—	‘	œ+ s¨AÓ1°A°6Ò9ÁeˆÑLð	Ü!¤,¨t¼SÀÀcÌDÏIÊIËKÑFWÐZ\ÑF\Ó=]Ñ"^Ð`aÖb‘Ø‘w‘Ø—H‘H“JØ‘9Ø—M‘M 1 &Õ)à˜Q‘K×&Ñ& qÔ)Ø‘9 “> Q¬#¨e«*¥_Ü˜D   1¤S¨£Z L°¼t¿yºy»{ÈRÑ?OÐPSÐ>TÐTVÐWÐ_cÔdñ cð !%§
+¡
+¤Ô=¢‘uq°A·F±F·H—¡ˆÑ=ÞÜÐ7¼¸D»	°{ÐBdÐeÐmqÒrÛ‘Ø×%Ñ% bÐ*PÖQñ à
+‰˜¨tˆÑ4Øˆ
+ùó' Møô ó 	Ùð	üã=s+   Á%GÂBG Ä8G Å!G,Æ G,Ç
+G)Ç(G)c           	      óŠ  >•  [         R                  R                  T
+U  S35      n[         R                  R                  U5      (       a*  [	        USS9 n[
+        R                  " U5      nSSS5        OiT	R                  (       aW  [        R                  " T	R                  R                  S5      SU  S3-   SS9nUR                  S	:w  a  gUR                  5       nOgWR                  S
+5      =(       d    UR                  S5      nT[        R                  " U5      R                  S5      R                  5       -
+  R!                  5       T	R"                  S
+-  :”  a  gT	R$                  n0 nUS    H¤  n[        R&                  " US   5      R)                  5       [        R                  " [        R                  " US   5      [+        SS9-
+  R-                  5       5      -
+  R.                  U:¼  d  M€  UR1                  US   / 5      R3                  U5        M¦     U(       a  Xu4$ S$ ! , (       d  f       GNU= f! [4         a     gf = f)uh   Linhas LEAPS por vencimento da coleta anterior, se ela for recente (--leaps-ttl-h). None se nÃ£o houver.r  rI   rJ   NrÒ   rà  r   rŠ   r   r!  r­  ÚUTCr  r3   r   r¥   rõ  )r  rT   r  ÚexistsrQ   rR   r  râ  rs   r•   rð   r—   r    r"   Ú
+tz_convertÚ
+to_pydatetimeÚ
+total_secondsÚleaps_ttl_hÚ	leaps_minrÖ   r$   r   rû  r×   r2  r*   rY   )rº   r  rV   rû   rŸ   ÚrefÚlimÚporrƒ   rÄ  rÛ   s           €€€r9   Ú
+prev_leapsÚmain.<locals>.prev_leaps  sÙ  ø€ ð	Ü—‘—‘˜S U G¨5 /Ó2ˆAÜw‰w~‰~˜a× Ñ Ü˜! gÒ.°!ÜŸ	š	 !›A÷ /Ð.à——Ü—L’L §¡×!5Ñ!5°cÓ!:¸}ÈUÈGÐSXÐ=YÑ!YÐceÑfØ—=‘= CÓ'ØØ—F‘F“H‘àØ—%‘%˜
+Ó#×: q§u¡u¨\Ó':ˆCØœŸš SÓ)×4Ñ4°UÓ;×IÑIÓKÑK×ZÑZÓ\Ð_c×_oÑ_oÐrvÑ_vÓvØØ—.‘.ˆCØˆCØv”YÜ—N’N 1 Q¡4Ó(×2Ñ2Ó4´r·|²|ÄRÇ\Â\ÐRSÐT`ÑRaÓEbÔenÐuvÑewÑEw×D}ÑD}ÓDó  8Añ  A÷  Gñ  Gð  KNõ  NØ—N‘N 1 Q¡4¨Ó,×3Ñ3°AÖ6ñ ö "%C:Ð.¨$Ð.÷# /Ö.ûô$ ó 	Ùð	úsK   ƒAH5 ÁH#Á+AH5 ÃH5 ÃA>H5 ÅBH5 Ç/1H5 È!H5 È#
+H2È-H5 È5
+IÉIc           	      óH  >• U  Vs0 s H  oT" U5      _M
+     nnTR                   (       a6  TR                  (       d%  UR                  [        TR                   U 5      5        TR                  (       aY  TR                  (       dH  UR                  [        U  Vs/ s H  oU   b  M
+  UPM     snTR                  TR                  5      5        U  Vs/ s H  oU   b  M
+  UPM     nnU(       a(  TR                  (       d  [        S[        U5       S3SS9  U$ s  snf s  snf s  snf )Nu;     [info] sem HV/candles (preÃ§o pela paridade put-call) em z& ativo(s); use --hv-yahoo para ter HV.Trî   )
+Úhist_urlr  Úupdater  Úhv_yahoor:  rÂ  Úhist_cache_hrñ   rÆ   )rØ   rû   r7   rp   rÄ  r)  s       €€r9   Ú
+carregar_histÚmain.<locals>.carregar_hist)  sÝ   ø€ Ù&+Ó,¢e ‘	˜!“Š_¡eˆÐ,Ø== §§Ø
+H‰H”^ D§M¡M°5Ó9Ô:Ø== §§Ø
+H‰HÔ%±%Ó&H²%¨Q¸Q¹4§q±%Ñ&HÈ$Ï/É/Ð[_×[lÑ[lÓmÔnÙÓ0š%Q Q¡4q™%ˆÐ0Þt—y—yÜÐOÔPSÐTWÓPXÈzÐYð  Að  IMò  
+NØˆùò 
+-ùò 'IùÚ0s   †DÂ	DÂ$DÃ	DÃDgffffffÖ?)ÚPETR4ÚVALE3ÚITUB4ÚBBAS3znenhum vencimento retornadoc                 óf   >• [         R                  " U 5      R                  5       T-
+  R                  $ rX   )r    rÖ   r$   r×   )r¼   rÙ   s    €r9   rè  Úmain.<locals>.<lambda>H  s"   ø€ œ"Ÿ.š.¨Ó+×5Ñ5Ó7¸$Ñ>×DÒDr;   z  vencimentos listados em r)  Úsc                 óÈ   >• U  Vs/ s H  nT" U5      TR                   ::  d  M  UPM     nnU Vs/ s H  nT" U5      S:¼  d  M  UPM     nnU=(       d    US S $ s  snf s  snf )Nr‰   r   )Ú	wheel_dte)r  r^   ÚcandÚboarÄ  rÜ   s       €€r9   Ú_repÚmain.<locals>._repL  s^   ø€ Ù#%ÓC¢2˜a©¨a«°D·N±NÑ)BŸ¡2ÐCÙ"&Ó8¢$˜Q©$¨q«'°R©-—q¡$Ð8ØŸ˜t R aÐ(Ð(ùò DùÚ8s   †A¤A°AÁAz  triagem de liquidez: z
+ candidatos, z vencimentos...c              3   ó*   #   • U  H	  oS    v •  M     g7f)rÀ   Nrª   )r?  rŸ   s     r9   r@  Úmain.<locals>.<genexpr>S  s   é € Ð7ª; a˜qžTª;ùrB  c                 ó   >• TU    * $ rX   rª   )rû   rù   s    €r9   rè  r[  T  s   ø€ ÐQWÐXYÑQZÑPZr;   )rL  r4  u@    candidato(s) sem opÃ§Ãµes negociadas ou sem dados (ignorados): z  mantidos os u    mais lÃ­quidos em opÃ§Ãµes: u	     PUT â‰¤zd: z vencimentos; LEAPS >z a baixar, z reaproveitados (<Úgzh)...zd + LEAPS >z vencimentos a baixar, z LEAPS reaproveitados (<r¨  z  refazendo z3 vencimento(s) que falharam, em ritmo mais lento...r   re   rþ   c                 ó*   >• [        TU S   U S   5      $ )Nr   r   )rÎ   )r:  r¹   s    €r9   rè  r[  Œ  s   ø€ ¼{È3ÐPRÐSTÑPUÐWYÐZ[ÑW\Ô?]r;   zvencimento u   nenhuma cotaÃ§Ã£o de opÃ§Ã£oz  [z>2rÒ   z] rè   z>5u
+    opÃ§Ãµes  S=z  HV=Ú%z	 FALHOU: r3   r­  rê  z           z usando coleta anterior (éŒ   z[info] o site limitou z+x (HTTP 429); a coleta desacelerou sozinha.rI   rJ   r  r  Ú
+falhas_motivor  c              3   óT   #   • U  H  oR                  S 5      (       a  M  Sv •  M      g7f©rë  r   N©r•   r>  s     r9   r@  rd  ¹  s   é € Ð;šu˜!¯E©E°'¯N—A‘Ašuùó   ‚(Ÿ	(rÅ   u   [aviso] a coleta trouxe sÃ³ uC    ativo(s) novo(s); mantendo tambÃ©m os dados da Ãºltima coleta boa.z
+longas.json: z
+ calls de z
+ a 730 dias (rø  i   z KB)z%d/%m/%Y %H:%Mznenhum ativo coletado)
+Ú
+updated_atÚupdated_brtrG  Úselic_fonteÚ
+selic_datar  r  r  rj  rí   r  rª  ry   c              3   óT   #   • U  H  oR                  S 5      (       a  M  Sv •  M      g7frl  rm  )r?  rû   s     r9   r@  rd  Ì  s   é € Ð7š5a¯©¨g¯—‘š5ùrn  u   ConcluÃ­do: z atualizados, z da coleta anterior, z falhas em rË  )[ÚargparseÚArgumentParserÚadd_argumentrÊ   r+   Ú
+parse_argsÚdiagr  rš  rÉ   Úgerar_universorÅ  r¿  rÂ  rÌ  rñ   rÆ   r¶  rÙ  r  rT   r  rÛ   r#  r   rÕ  r   r¯  r	   r°  r    r"   r   rû  r  Útopr×  r³  r_  rÃ  r  ÚonlyrË   r€  r`  râ  rD  rï  rS   rb   r|   ri   r±  rW  rŠ  rz   rÝ   r¶   rƒ  r  ry   ÚsumrF  Úput_dterI  rH  r0  r*   r'   rr   r   rž  r  r2  r»  r™   r•   rY   rå  rÈ   rk   rQ   rR   r  r/  rÜ  r   Úgetsizer$  Úboolr‚  )OÚapÚunir¾  Úitr2  Úprazor  r×  rž   Úpedidosrr  Úfonte_selicÚnovos_Úliq_rØ   r  ÚmotivosÚtotalr%  rû   rí   Úhistsr@  rM  rT  re  r4   rV  r7  ÚmeioÚglobrJ  Úvenc_porra  r¼   Úcurtosr6  Ú	sem_dadosr^   rŸ   rã  Úput_vencÚreaproveitadosÚlongosÚlvÚprÚprevr4  r  rJ  rº   r3   rÿ  r¡   Úsem_hv_prevrV   ÚantigoÚusetÚnestarì  Ú	n_frescosrí  Úliq_prevÚn_longÚmetaÚfreshrƒ   rÄ  rÜ   r>  r)  rÙ   r#  r$  r¹   rÛ   r?  rG  rù   sO                                                                     @@@@@@@@@@@@@r9   ÚmainrŸ  ˆ  sw  ÿü€ Ü	×	 Ò	 Ó	"€BØ‡OOG V€OÑ,Ø‡OOJÐ(;€OÑ<Ø‡OOL¨-À-ÐQZÐA[ð Ið ñ Jà‡OOH¤3°ð  ;h€Oñ  iØ‡OOH \€OÑ2Ø‡OOL¨"€OÑ-Ø‡OOK¤c°1ð  <W€Oñ  XØ‡OOM¬°tð  C\€Oñ  ]Ø‡OOK¤e°TÐ@q€OÑrØ‡OOG¤#¨qð  8~€Oñ  Ø‡OOM¬°Rð  ?p€Oñ  qØ‡OOM¬°SÐ?~€OÑØ‡OOK¤c°2Ð<~€OÑØ‡OOO¬%¸ð  Dh€Oñ  iØ‡OON¨GÐ:e€OÑfØ‡OOÐ$¬5¸$ð  FS€Oñ  TØ‡OOL¨"ð  4\€Oñ  ]Ø‡OOL¨ð  =G€Oñ  HØ‡OOH¤3°ð  <G€Oñ  HØ‡OOL¤s°BÐ=[€OÑ\Ø‡OON¬°bð  @J€Oñ  KØ‡OOÐ&¨|ð  CR€Oñ  SØ‡OOH bð  0B€Oñ  CØ‡OOH bÐ/l€OÑmØ
+=‰=‹?€Dà‡y‡yÜ˜4Ÿ9™9Ÿ?™?Ó,×2Ñ2Ó4Ó5Ð5Ø××Ü˜TÓ"ˆÜ!Ð"4°c¸4¿?¹?ÈDÏMÉMÓZˆÛˆBÜBr˜%‘y n B r¨#¡w¨r l°&¸¸F¹¸ÀJÐceÐfrÑcsÑcÈrÐR^ÒO_ð  FKð  OLð  Mö  
+Nñ ä
+Ð*¬3¨u«:¨,°jÐAÔBØØ‡yyAƒ~Ü˜4Ó Ð Ü
+'‰',‰,t—x‘x ¨Ó
+2€CÜ‡K‚K˜dÒ#Ü	
+Š‹€BØ—‘ Ñ"Ñ"€EÜLŠLœŸ™Ó&€EÜ
+<Š<˜¤°Ñ!3Ñ3×9Ñ9Ó;Ó<€DØ˜2ˆHØ‡yyÑ T§Y§YÜ! $Ó'ˆØ˜4Ÿ9™9 q™=¨D¯M©MÑ9¸$¿)¹)ÀdÇmÁmÑ:SÐTˆØˆŒÞÜE˜$Ÿ)™)˜Ð$:¼3¸x»=¸/ÈÐTÔUØÜ
+d—i‘i[  4§9¡9¨VÓ#4Ð"5Ð6¸dÓCØ	
+‰˜-Ó	'°·	·	Ü% d§i¡i°·±ÓAˆÞd—i‘iÑ'Ü˜DŸK™KÓ(ˆØ‡y‡yØ.2¯i©i¯o©o¸cÔ.BÓPÒ.B¨ÇgÁgÇiÓ$1—7‘7“9—?‘?Ö$Ñ.BˆÐPÙ$Ó4šW˜¨V©—!™WÑ4×?¸ˆÜ	ˆJ”s˜6“{m 9°t·y·y©VÀgÐ,NÈaÐ
+PÔQà26·)·)œ vÑ.ÄÃÑ€Eˆ:Ø ŸIŸI‘&¶U©EÀ€KØ}ÜˆÜ	ˆGE˜C‘K Ð$ C¨ }Î°S¸:Ò5EÐY[Ð4\Ð\]Ð
+^Ô_à‡yyÑ T§Y§Y°4·=·=ÌÏÉÏÉÔXZ×X_ÑX_×XdÑXdÐehÐjuÓXv×IwÑIwÜ% d§m¡m°S¸"Ó=‰ˆÞÜ”—‘—‘˜c ;Ó/¸FÈbÐ^bÐnpÑ1qÔrÜ
+
+ˆdl‰l˜DŸN™NÓ
++€CØ  R7ˆ6Ü‹K€EØ‰¨	ˆÐ2€H÷fñ fõ$Lñ  &Ó&šv˜!2’™vÑ&€HØ€LØ€JØ€HØ€E÷ð ÷:ö4	ð ‡y‡yÙ˜fÓ%ˆÛˆAÜ& u¨Q¡xÓ0‰KˆAˆq!RÜ% a¨¨B°Ó5ˆHQ‹Kó ô YŠY‹[ˆØ˜R‘Z 4Ñ'Ñ'ˆØ#ŸxŸx‘t¨UˆŒð ˆÛ7ˆCÜ&¤{°3¸Ó'<¸dÄGÓLˆDßˆtÙñ 8ñ ,2Ó2ª6 aA”t˜D“z’M©6ˆÐ2ÞÛØ #§¡× IÐ,I
+˜1“
+ñ äDˆÜ
+Ð*¬4¯9ª9«;¸Ñ+;¸CÐ*@ÀÐBÈ$ÒOØ88ˆ8ö
+)ñ '-ÔH¢f ±d¸8ÀA¹;×6G°q˜!“fÑ6G‘f¡fˆFÑHÜÐ+¬C°«K¨=¸
+ÄcÈ&ÃkÀ]ÐRaÐbÐjnÒoÙ˜V TÓ*ˆFÙAGÓHÂ¸AaœÑ7¨8°Aª;Ó7Ó7Ò7ÁÑHˆFÜ©&Ó@ª& Q°H¸QµKŸq©&Ñ@ÔFZÑ[ˆHÙ$*Ó>¢F˜q°(¸1µ+Ÿ¡FˆIÐ>ÞÜ˜	¤# i£.Ð!1Ð1qÐrv×r{Ñr{ð  }Fó  sGð  rHð  Ið  QUò  VØ˜i˜tŸx™xÐ(ˆFÜN¤3 v£; -Ð/LÈTÏYÉYÐW]ÓM^ÐL_Ð`ÐhlÒmÜ˜(–^Ø˜F•?Ø  šñ $ñ "(Ó<¢˜A¨1¨Q©4°8Ñ+;—a¡ˆFÐ<Ù"*ÕP¢(˜QÀ8ÈAÂ;Ó4OÂ;¸a°Q°q´TÁ;Õ4O¨q1a“&Ñ4O‘&¡(ÓPÑgmÔSnÒgmÑ_cÐ_`ÐbcÐUVÐXYÓTZÑgmÒSnÑnˆBÙ(.Ôyª 1¸À½°1ÀqÉDÐQRËGÕGcÐW[×WcÑWcÑGc›ÑGc™ÐijÐlmÐhnÐvxÑhx›˜˜A›¹™©ˆHÑyØˆNØˆFÛØ!)¨!¢ÓJ¢˜A±°Q³¸4¿>¹>Ñ0I—a¡ÐJÞ')¨d×.>Ñ.>ÀÓ.B‘Z ”]ÈÞ "r˜!’u¨ÞØ&(¨¡eL ‘OÛAØÑ'¨A°«IØ  ™×*Ñ*¨4°©7Ô3Ø&¨!Ñ+šàŸ
+™
+ q¨! fÖ-ó ñ
+ ô 
+I˜dŸl™l˜^¨3¬s°8«}¨oÐ=RÐSW×SaÑSaÐRbÐbeÔfiÐjpÓfqÐerÐr}Ø#Ð$Ð$6°t×7GÑ7GÈÐ6JÈ%ðQØX\ò
+^à‘g˜h¨Ñ/°Ó7Ñ7ŠFà$&¨>ˆEÛØ!)¨!¢ÓJ¢˜A±°Q³¸4¿>¹>Ñ0I—a¡ÐJÞ')¨d×.>Ñ.>ÀÓ.B‘Z ”]ÈÞ "r˜!’u¨ÞØ&(¨¡eL ‘OØ¨(°1ª+ÓVª+ Q¸¹dÀ1»gÕ9UÈÏÉÑ9U›&Ñ9U™&˜1˜a›&©+ÑVÑVÛAØÑ'¨A°«IØ  ™×*Ñ*¨4°©7Ô3Ø&¨!Ñ+šàŸ™ a¨ VÖ,ó ñ ô 
+I˜dŸl™l˜^¨;°t·~±~Ð6FÀcÌ#ÈeË*ÈÐUlØ#Ð$Ð$<¸T×=MÑ=MÈaÐ<PÐPRðTØ[_ò
+aá˜U EÓ*ˆFØˆŒÙ˜fÓ%ˆÞ”d—i’i“k EÓ)ÜL¤ V£ 
+Ð-`ÐaÐimÒnÜ §
+¡
+¨sÓ3ˆCŒMØˆCŒMØ  3™;ˆCŒLÜ#°Ò2°bÜ!$ V¨R¯V©VÔ4]Ð_eÓ-fÖ!g‘I‘FQ˜˜AØ‘yØ"×-Ñ-¨a°;¸q¸cÀÀCÇHÁHÀ:Ð1NÖOà  ™×*Ñ*¨1Ö-ñ	 "h÷ 3ô 
+‹K€Eä˜f aÖ(‰ˆˆ5ð	.Ø˜E‘?ˆDÞÜ  §¡°Ó!6×!d¸#¿(¹(×!dÐFdÓeÐeÙ  ¨¨e©°dÓ;‰KˆD!RØL‰L˜ÔÜC˜˜"v˜Q˜u˜g R¨¨b z°°4¸±9¸R°.À
+ÈaÐPSÈWÐTYÐZ\Ð_bÑZbÐcfÐYgÐghÐiÐquÔvñ )ð" ‡x‡xÜ
+Ð& s§x¡x jÐ0[Ð\Ô]à€KØ‡yyÒ T§Y§Y Yð	Ü”b—g‘g—l‘l 3¨Ó4¸wÒGÈ1ÜŸš 1›÷ Hô ˜x›=¬#¨f«+ÉÓ7NÊÀ1¸¸#¼ÉSÐ7NˆeˆØ—‘˜H bÖ)ˆAØ‰v˜UÕ" q¨¡v°SÕ'8¸Q¸s¹VÀt½^Ø—‘˜Q”Ø—‘˜˜#™–ñ *ð —‘˜H bÖ)ˆAØ˜~ ! t¥)°¸µÀÅØ—
+‘
+˜aÔ Ø$Ÿj™j¨Ó9×?¸R×DÑDÀQÈÓK˜“
+ñ *ð #)§*¡*¨X°rÔ":Ó[Ò":˜QÀu¹n“qÐQRÐVZÑQZ—qÑ":ˆÐ[Ù'Ó4šx˜!°©8—A™xˆÐ4ÜÑ;™uÓ;Ó;€IØ‡}‡}˜TŸYŸY¨4¯9©9Ñ+<ÀÈQÃÜ
+Ð,¨Y¨KÐ7zÐ{ð  DHò  	IÜ(¨¯©¸¸UÓC‰ˆˆxØ
+‰ˆÞØˆHÙ &ÔK¢˜1ÁEÓ3JÂE¸q°A°c´FÁEÑ3JÑ*J—Q¡ÒKˆ‰qˆ	Ü
+˜#˜u d§n¡nÓ
+5€FÜ	ˆM˜&˜ ¨D¯N©NÐ+;¸=ÌÏÉÏÉÔY[×Y`ÑY`×YeÑYeÐfiÐkxÓYyÓIzð  Cñ  JCð  IDð  DHð  Iô  Jð —o‘o¨yoÐ9Ø¤	°Ñ 2Ñ2×<Ñ<Ð=MÓNØ {ÜT—Y‘Y“¨5ÐU\Ðjr÷  kNñ  HMó  wNò  HMð  CDÐwxÐy|Ôw}ñ  HMñ  wNñ  fló  ZEò  flð  abð  pu÷  pyñ  pyð  z{ó  p|÷  [\ñ  flñ  ZEð  HSñ  ZSô  `eô  fj÷  foò  foó  fqð  tvñ  fvð  xyó  `zÞ‘ #§(¡(×"EÐ.Eñ€Dô 	Œ‰‰c˜;Ó	'¨Ô.ÜÑ7™5Ó7Ó7€EÜ	ˆL˜˜˜~¬c°%«j¸5Ñ.@Ð-AÐAVÔWZÐ[aÓWbÐVcð dÜ—	’	“˜bÑ  Ð% Rð)ô *àùòW QùÚ4ùòN 'ùòp 3ùó Iùò IùÚ@ùÚ>ùò =ùÚ4OùÔPùÓSnùÛyùò Kùò" Kùò
+ W÷" 3Ö2ûô  ó 	.ÜC˜˜"v˜Q˜u˜g R¨¨b z°¸1¸#Ð>ÀdÒKØDHÇMÇMÔ% d§m¡m°U¸CÔ@ÐW[ˆDÞØ—‘ 5¬s°4¸±<Ó/@ÐPT×PXÑPXÐYeÓPfÐquÑvÔwÜ˜ E¨" :Ð-FÀtÇxÁxÐP\ÓG]ÐF^Ð^_Ð`×aÓaà—
+‘
+˜eÔ$Ü!$ Q£¨¨ ˜—ûð	.ú÷ HÖGûäó 	Ø‹Fð	üâ7Nùò \ùÚ4ùò 4KùÓKùò wNùò  ZEs¸  ÔAKÔ""AKÕ
+	AKÕAKÜ
+AKß?AKâ!AK$ã AK*äAK/äAK/ä.AK4å AK4ç
+AK9ç AK9ç.
+ALç;AK>è
+ALè&AL
+é*ALé0ALé4ALé>ALêALê;ALî7ALïALð#!AL ñAL ñAL õ&A)AL%÷5BAL7û(AP' û:APüAP' ü1AP:Á@-	AP?Á@:AP?ÁAAP?ÁA	AQÁAAQÁC%
+AQÁC/AQ	ÁC>AQÁDAQÁGAQÁG)AQÁHAQÁK>ALÁL%
+AL4ÁL7
+APÁMBAP
+ÁO$"AP
+ÁP
+APÁP
+AP$ÁPAP' ÁP$AP' ÁP'AP7ÁP6AP7ÁQ	AQÚ__main__)r(  )r  rŽ   éZ   rÐ   )F)r  g      8@)r  r‰   )r   )IÚ__doc__rt  rR   rZ   r  rÍ  rl   r   r   rÐ  Úior   Úconcurrent.futuresr   r   r   r   r   r	   Únumpyr   Úpandasr    rs   r:   rü  r€  rƒ  r]  r–   rS   r_   Úenvironr•   r¸   rb   r±   r¶   rÎ   rÇ   rÝ   rê   ró   r  r  r  r'  r:  rN  rW  r`  rc  rl  r{  rŠ  r®  r¤  r³  r¿  rÅ  rÙ  rÃ  rå  rï  r   r  rÊ   rŸ  r›   ÚcodeÚstdoutrï   Ú_exitrª   r;   r9   Ú<module>r«     s‡  ðñó Û Û Û 	Û 
+Û Û Û Û Ý ß MÑ Mß 2Ñ 2ã Û Û ô]ò J€Ø€Ø
+
+€Ø
+Z€ðHà>Ø0Ø(Ø5ñ
+€òVò
+;ð :‰:>‰>˜,Ð(?Ó@€÷:ñ :òzkòòò@|ð .5ô 	ò3ò	òò0
+òòTô-ò`!ò01ò
+ò 2ò<ò(òð6 A€ô(ôôBò$ò
+ò@òò"(ô&
+ò<
+ð8G
+ˆcô G
+ðT
+ ˆzÓÙ‹6€DØ‡JJ×ÑÔØ‡H‚HˆT…Nð r;   
