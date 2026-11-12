@@ -52,7 +52,7 @@ jobs:
           --lote 0
           --lote-tam 10
           --n-universo 80
-          --wheel-dte 45
+          --wheel-dte 60
           --put-dte 60
           --leaps-min 90
           --hv-yahoo
